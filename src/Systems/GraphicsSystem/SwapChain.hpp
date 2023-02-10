@@ -6,30 +6,27 @@ namespace TwilliEngine
 class SwapChain
 {
 public:
-    SwapChain(HWND window, ID3D11Device* device, ID3D11DeviceContext* device_context);
+    SwapChain(HWND window);
     ~SwapChain();
 
-    void BindSwapChain(ID3D11DeviceContext* context);
-    void ClearSwapChain(ID3D11DeviceContext* context);
+    void BindSwapChain();
+    void ClearSwapChain();
 
-    void ResizeBuffers(ID3D11Device* device, ID3D11DeviceContext* context,
-                       UINT width, UINT height, HWND window);
+    void ResizeBuffers(UINT width, UINT height, HWND window);
 private:
 
-    void CreateSwapChainBuffer(ID3D11Device* device, 
-                               UINT width, UINT height, HWND window);
+    void CreateSwapChainBuffer(UINT width, UINT height, HWND window);
     
 
-    void CreateRenderTargetView(ID3D11Device *device);
-    void CreateRasterizerState(ID3D11Device *device, ID3D11DeviceContext *context);
-    void CreateDepthStencilState(ID3D11Device* device, ID3D11DeviceContext* context);
-    void CreateDepthBuffer(ID3D11Device* device, UINT width, UINT height);
-    void CreateDepthStencilView(ID3D11Device* device);
-    void CreateBlendState(ID3D11Device* device, ID3D11DeviceContext* context);
-    void SetViewport(ID3D11DeviceContext* context, UINT width, UINT height);
+    void CreateRenderTargetView();
+    void CreateRasterizerState();
+    void CreateDepthStencilState();
+    void CreateDepthBuffer(UINT width, UINT height);
+    void CreateDepthStencilView();
+    void CreateBlendState();
+    void SetViewport(UINT width, UINT height);
 
 public:
-
     IDXGISwapChain1* mSwapChain;
     ID3D11RenderTargetView* mRenderTargetView;
     ID3D11Texture2D* mDepthStencilBuffer;

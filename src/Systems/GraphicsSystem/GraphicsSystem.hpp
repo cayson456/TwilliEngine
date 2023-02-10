@@ -1,6 +1,5 @@
 #pragma once
 #include "Systems/System.hpp"
-#include "D3D.hpp"
 #include "Window.hpp"
 #include "SwapChain.hpp"
 
@@ -18,7 +17,6 @@ public:
 
 private:
     std::unique_ptr<Window> mWindow;
-    std::unique_ptr<D3D> mD3D;
     std::unique_ptr<SwapChain> mSwapChain;
 };
 

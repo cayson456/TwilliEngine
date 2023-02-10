@@ -4,27 +4,25 @@
 
 namespace TwilliEngine {
 
-SwapChain::SwapChain(HWND window,
-                     ID3D11Device *device, 
-                     ID3D11DeviceContext* device_context) : mSwapChain(nullptr),
-                                                            mRenderTargetView(nullptr),
-                                                            mDepthStencilBuffer(nullptr),
-                                                            mDepthStencilState(nullptr),
-                                                            mDepthStencilView(nullptr),
-                                                            mRasterizerState(nullptr),
-                                                            mBlendState(nullptr)
+SwapChain::SwapChain(HWND window) : mSwapChain(nullptr),
+                                    mRenderTargetView(nullptr),
+                                    mDepthStencilBuffer(nullptr),
+                                    mDepthStencilState(nullptr),
+                                    mDepthStencilView(nullptr),
+                                    mRasterizerState(nullptr),
+                                    mBlendState(nullptr)
                                                             
 {
 
         // Initialize Everything
-    CreateSwapChainBuffer(device, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), window);
-    CreateRenderTargetView(device);
-    CreateRasterizerState(device, device_context);
-    CreateDepthStencilState(device, device_context);
-    CreateDepthBuffer(device, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
-    CreateDepthStencilView(device);
-    CreateBlendState(device, device_context);
-    SetViewport(device_context, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+    CreateSwapChainBuffer(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), window);
+    CreateRenderTargetView();
+    CreateRasterizerState();
+    CreateDepthStencilState();
+    CreateDepthBuffer(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+    CreateDepthStencilView();
+    CreateBlendState();
+    SetViewport(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 }
 
 SwapChain::~SwapChain()
@@ -37,37 +35,35 @@ SwapChain::~SwapChain()
     SafeRelease(mBlendState);
 }
 
-void SwapChain::BindSwapChain(ID3D11DeviceContext* context)
+void SwapChain::BindSwapChain()
 {
-    context->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
-    context->OMSetDepthStencilState(mDepthStencilState, 0xFF);
-    context->OMSetBlendState(mBlendState, nullptr, 0xFFFFFFFF);
+    D3D::GetInstance()->GetContext()->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+    D3D::GetInstance()->GetContext()->OMSetDepthStencilState(mDepthStencilState, 0xFF);
+    D3D::GetInstance()->GetContext()->OMSetBlendState(mBlendState, nullptr, 0xFFFFFFFF);
 }
 
-void SwapChain::ClearSwapChain(ID3D11DeviceContext* context)
+void SwapChain::ClearSwapChain()
 {
     const float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    context->ClearRenderTargetView(mRenderTargetView, clear_color);
-    context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    D3D::GetInstance()->GetContext()->ClearRenderTargetView(mRenderTargetView, clear_color);
+    D3D::GetInstance()->GetContext()->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
-void SwapChain::ResizeBuffers(ID3D11Device* device, ID3D11DeviceContext* context, 
-                              UINT width, UINT height, HWND window)
+void SwapChain::ResizeBuffers(UINT width, UINT height, HWND window)
 {
-    CreateSwapChainBuffer(device, width, height, window);
-    CreateDepthBuffer(device, width, height);
-    SetViewport(context, width, height);
+    CreateSwapChainBuffer(width, height, window);
+    CreateDepthBuffer(width, height);
+    SetViewport(width, height);
 }
 
-void SwapChain::CreateSwapChainBuffer(ID3D11Device* device,
-                                      UINT width, UINT height, HWND window)
+void SwapChain::CreateSwapChainBuffer(UINT width, UINT height, HWND window)
 {
     SafeRelease(mSwapChain);
 
         // Multisampling Parameters
     constexpr UINT SAMPLE_COUNT = 1;
     UINT num_quality_levels;
-    device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, SAMPLE_COUNT, &num_quality_levels);
+    D3D::GetInstance()->GetDevice()->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, SAMPLE_COUNT, &num_quality_levels);
 
     DXGI_SWAP_CHAIN_DESC1 sd;
     {
@@ -87,7 +83,7 @@ void SwapChain::CreateSwapChainBuffer(ID3D11Device* device,
     }
 
     IDXGIDevice* pDXGIDevice;
-    err::Assert(err::HRCheck(device->QueryInterface(__uuidof(IDXGIDevice), (void**)&pDXGIDevice)),
+    err::Assert(err::HRCheck(D3D::GetInstance()->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&pDXGIDevice)),
                 "Unable to create Swap Chain Buffer");
 
     IDXGIAdapter* pDXGIAdapter;
@@ -98,10 +94,10 @@ void SwapChain::CreateSwapChainBuffer(ID3D11Device* device,
     err::Assert(err::HRCheck(pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pIDXGIFactory)),
                 "Unable to create Swap Chain Buffer");
 
-    err::Assert(err::HRCheck(pIDXGIFactory->CreateSwapChainForHwnd(device, window, &sd, NULL, NULL, &mSwapChain)),
+    err::Assert(err::HRCheck(pIDXGIFactory->CreateSwapChainForHwnd(D3D::GetInstance()->GetDevice(), window, &sd, NULL, NULL, &mSwapChain)),
                 "Unable to create Swap Chain Buffer");
 }
-void SwapChain::CreateRenderTargetView(ID3D11Device* device)
+void SwapChain::CreateRenderTargetView()
 {
     SafeRelease(mRenderTargetView);
 
@@ -117,12 +113,12 @@ void SwapChain::CreateRenderTargetView(ID3D11Device* device)
     desc.Format = sd.BufferDesc.Format;
     desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
 
-    err::Assert(err::HRCheck(device->CreateRenderTargetView(back_buffer_texture, &desc, &mRenderTargetView)),
+    err::Assert(err::HRCheck(D3D::GetInstance()->GetDevice()->CreateRenderTargetView(back_buffer_texture, &desc, &mRenderTargetView)),
         "Failed to create the Render Target View");
 
     SafeRelease(back_buffer_texture);
 }
-void SwapChain::CreateRasterizerState(ID3D11Device* device, ID3D11DeviceContext* context)
+void SwapChain::CreateRasterizerState()
 {
     SafeRelease(mRasterizerState);
 
@@ -139,12 +135,12 @@ void SwapChain::CreateRasterizerState(ID3D11Device* device, ID3D11DeviceContext*
     desc.ScissorEnable = false;
     desc.SlopeScaledDepthBias = 0.0f;
 
-    err::Assert(err::HRCheck(device->CreateRasterizerState(&desc, &mRasterizerState)),
+    err::Assert(err::HRCheck(D3D::GetInstance()->GetDevice()->CreateRasterizerState(&desc, &mRasterizerState)),
         "Unable to Create Rasterizer State");
 
-    context->RSSetState(mRasterizerState);
+    D3D::GetInstance()->GetContext()->RSSetState(mRasterizerState);
 }
-void SwapChain::CreateDepthStencilState(ID3D11Device* device, ID3D11DeviceContext* context)
+void SwapChain::CreateDepthStencilState()
 {
     SafeRelease(mDepthStencilState);
 
@@ -170,12 +166,12 @@ void SwapChain::CreateDepthStencilState(ID3D11Device* device, ID3D11DeviceContex
     desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-    err::Assert(err::HRCheck(device->CreateDepthStencilState(&desc, &mDepthStencilState)),
+    err::Assert(err::HRCheck(D3D::GetInstance()->GetDevice()->CreateDepthStencilState(&desc, &mDepthStencilState)),
         "ERROR: Unable to Create Depth Stencil State");
 
-    context->OMSetDepthStencilState(mDepthStencilState, 1);
+    D3D::GetInstance()->GetContext()->OMSetDepthStencilState(mDepthStencilState, 1);
 }
-void SwapChain::CreateDepthBuffer(ID3D11Device* device, UINT width, UINT height)
+void SwapChain::CreateDepthBuffer(UINT width, UINT height)
 {
     SafeRelease(mDepthStencilBuffer);
 
@@ -193,10 +189,10 @@ void SwapChain::CreateDepthBuffer(ID3D11Device* device, UINT width, UINT height)
     desc.CPUAccessFlags = 0;
     desc.MiscFlags = 0;
 
-    err::Assert(err::HRCheck(device->CreateTexture2D(&desc, NULL, &mDepthStencilBuffer)),
+    err::Assert(err::HRCheck(D3D::GetInstance()->GetDevice()->CreateTexture2D(&desc, NULL, &mDepthStencilBuffer)),
         "ERROR: Unable To Create Depth Stencil Buffer");
 }
-void SwapChain::CreateDepthStencilView(ID3D11Device* device)
+void SwapChain::CreateDepthStencilView()
 {
     SafeRelease(mDepthStencilView);
 
@@ -207,10 +203,10 @@ void SwapChain::CreateDepthStencilView(ID3D11Device* device)
     desc.Texture2D.MipSlice = 0;
     desc.Flags = 0;
 
-    err::Assert(err::HRCheck(device->CreateDepthStencilView(mDepthStencilBuffer, &desc, &mDepthStencilView)),
+    err::Assert(err::HRCheck(D3D::GetInstance()->GetDevice()->CreateDepthStencilView(mDepthStencilBuffer, &desc, &mDepthStencilView)),
         "ERROR: Unable To Create Depth Stencil View");
 }
-void SwapChain::CreateBlendState(ID3D11Device* device, ID3D11DeviceContext* context)
+void SwapChain::CreateBlendState()
 {
     SafeRelease(mBlendState);
 
@@ -230,12 +226,12 @@ void SwapChain::CreateBlendState(ID3D11Device* device, ID3D11DeviceContext* cont
         desc.RenderTarget[i].RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
     }
 
-    err::Assert(err::HRCheck(device->CreateBlendState(&desc, &mBlendState)),
+    err::Assert(err::HRCheck(D3D::GetInstance()->GetDevice()->CreateBlendState(&desc, &mBlendState)),
         "ERROR: Unable to Create Blend State");
 
-    context->OMSetBlendState(mBlendState, NULL, 0xFFFFFFFF);
+    D3D::GetInstance()->GetContext()->OMSetBlendState(mBlendState, NULL, 0xFFFFFFFF);
 }
-void SwapChain::SetViewport(ID3D11DeviceContext* context, UINT width, UINT height)
+void SwapChain::SetViewport(UINT width, UINT height)
 {
     D3D11_VIEWPORT vp;
     vp.Width = static_cast<float>(width);
@@ -245,6 +241,6 @@ void SwapChain::SetViewport(ID3D11DeviceContext* context, UINT width, UINT heigh
     vp.TopLeftX = 0.0f;
     vp.TopLeftY = 1.0f;
 
-    context->RSSetViewports(1, &vp);
+    D3D::GetInstance()->GetContext()->RSSetViewports(1, &vp);
 }
 }

@@ -4,3 +4,14 @@
 *.pch
 *.pdb
 *.recipe
+*.exe
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.opendb
+*.db
+*.db-wal
+*.lock
+*.vsidx
+*.db-shm
+*.ipch

@@ -1,7 +1,6 @@
 #include "precompiled.hpp"
 #include "D3D.hpp"
 
-
 namespace TwilliEngine 
 {
 
@@ -12,15 +11,15 @@ D3D::D3D() : mDevice(nullptr), mDeviceContext(nullptr),
     // Specify Drivers and Features
     D3D_DRIVER_TYPE driver_types[] =
     {
-      D3D_DRIVER_TYPE_HARDWARE,
-      D3D_DRIVER_TYPE_REFERENCE
+        D3D_DRIVER_TYPE_HARDWARE,
+        D3D_DRIVER_TYPE_REFERENCE
     };
 
     D3D_FEATURE_LEVEL feature_levels[] =
     {
-      D3D_FEATURE_LEVEL_11_1,
-      D3D_FEATURE_LEVEL_11_0,
-      D3D_FEATURE_LEVEL_10_0
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_0
     };
 
     unsigned total_driver_types = ARRAYSIZE(driver_types);

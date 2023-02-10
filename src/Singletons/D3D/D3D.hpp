@@ -1,8 +1,9 @@
 #pragma once
+#include "Singletons/Singleton.hpp"
 
 namespace TwilliEngine
 {
-class D3D
+class D3D : public Singleton<D3D>
 {
 public:
     D3D();

@@ -28,3 +28,5 @@
 #include "Utils/ErrorChecking.hpp"
 #include "Utils/Constants.hpp"
 #include "Utils/D3DSafeRelease.hpp"
+
+#include "Singletons/D3D/D3D.hpp"

@@ -14,17 +14,9 @@ GraphicsSystem::GraphicsSystem()
         err::Assert(true, "Unable to Create Main Window");
     }
 
-        // Create D3D
-    try {
-        mD3D = std::make_unique<D3D>();
-    }
-    catch (std::exception ex) {
-        err::Assert(true, "Unable to Create D3D");
-    }
-
         // Create Swapchain
     try {
-        mSwapChain = std::make_unique<SwapChain>(mWindow->GetHandle(), mD3D->GetDevice(), mD3D->GetContext());
+        mSwapChain = std::make_unique<SwapChain>(mWindow->GetHandle());
     }
     catch (std::exception ex) {
         err::Assert(true, "Unable to Create SwapChain");
@@ -38,7 +30,7 @@ GraphicsSystem::~GraphicsSystem()
 
 void GraphicsSystem::StartFrame()
 {
-    mSwapChain->BindSwapChain(mD3D->GetContext());
+    mSwapChain->BindSwapChain();
 }
 
 void GraphicsSystem::Update(float )
@@ -47,7 +39,7 @@ void GraphicsSystem::Update(float )
 
 void GraphicsSystem::EndFrame()
 {
-    mSwapChain->ClearSwapChain(mD3D->GetContext());
+    mSwapChain->ClearSwapChain();
 }
 
 } // namespace TwilliEngine
