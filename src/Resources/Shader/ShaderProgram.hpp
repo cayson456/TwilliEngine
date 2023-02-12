@@ -10,11 +10,13 @@ namespace TwilliEngine
 class ShaderProgram : public ResourceBase<ShaderProgram>
 {
 public:
-    ShaderProgram();
-    ~ShaderProgram();
+    ShaderProgram() {}
+    ShaderProgram(const std::string &name) : ResourceBase(name) {}
+    ~ShaderProgram() {}
   
     void Build();
-  
+    void Bind();
+
     // TODO:
     void SetConstantBuffers() {}
     // TODO:
@@ -23,7 +25,7 @@ public:
     void AttachShader(Shader::Type type, Shader::Key shader);
     Shader::Key GetShader(Shader::Type type) { return mShaders[type]; };
 
-    void Bind();
+    
 
 private:
     Shader::Key mShaders[Shader::Type::COUNT];

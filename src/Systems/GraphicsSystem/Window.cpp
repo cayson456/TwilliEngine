@@ -32,7 +32,7 @@ Window::Window(UINT screen_width, UINT screen_height,
     }
 
     ATOM class_name = RegisterClassEx(&wc);
-    if (!class_name) throw std::exception("Unable to Register Window Class");
+    err::Assert(class_name, "Unable to Register Window Class");
 
         // Create Window
     int posX = (GetSystemMetrics(SM_CXSCREEN) - mScreenSize.first) / 2;
@@ -42,7 +42,7 @@ Window::Window(UINT screen_width, UINT screen_height,
         WS_OVERLAPPEDWINDOW | WS_VISIBLE, posX, posY, mScreenSize.first, mScreenSize.second,
         NULL, NULL, GetModuleHandle(NULL), NULL);
 
-    if (!mWindowHandle) throw std::exception("Unable to Create Window");
+    err::Assert(mWindowHandle, "Unable to Create Window");
 
     ShowWindow(mWindowHandle, SW_SHOW);
     UpdateWindow(mWindowHandle);

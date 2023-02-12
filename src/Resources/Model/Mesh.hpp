@@ -3,17 +3,14 @@
 
 namespace TwilliEngine
 {
-struct Face {
-    UINT mIndices[3];
-};
-
 class Mesh : public ResourceBase<Mesh>
 {
 public:
-    Mesh();
+    Mesh() : mIndexBuffer(nullptr), mBufferArray(), mNumIndices(0) {}
+    Mesh(const std::string& name) : ResourceBase(name), mIndexBuffer(nullptr), mBufferArray(), mNumIndices(0) {}
     ~Mesh();
   
-    bool Build();
+    void Build();
     void Bind();
 
     enum VertexAttributeType
@@ -32,9 +29,9 @@ public:
     // Does nothing if data is null
     template <typename T>
     void CreateVertexBuffer(VertexAttributeType type, const T *data, size_t num_elements);
-    void CreateIndexBuffer(Face *faces, size_t num_faces);
+    void CreateIndexBuffer(const UINT* indices, UINT num_indices);
 
-    int mNumIndices;
+    UINT mNumIndices;
 
 private:
     ID3D11Buffer *mIndexBuffer;
@@ -67,7 +64,10 @@ inline void Mesh::CreateVertexBuffer(VertexAttributeType type, const T *data, si
     }
 
     HRESULT hr = D3D::GetInstance()->mDevice->CreateBuffer(&desc, &res_data, &mBufferArray[type]);
-    err::HRWarn(hr, "Warning! Unable to create a vertex buffer");
+    if (!err::HRCheck(hr)) {
+        err::LogError("Unable to create vertex bufffer for mesh: ", mName);
+        return;
+    }
 
 }
 

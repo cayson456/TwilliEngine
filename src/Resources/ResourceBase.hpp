@@ -1,35 +1,24 @@
 #pragma once
 #include "ResourceID.h"
-#include "Systems/GraphicsSystem/D3D.hpp"
 
 // NOTE:
 // Consider making every resource bindable, buildable, and check if built.
+// TODO: Exception throwing for when resource creation fails
 
 namespace TwilliEngine
 {
-
-/*!*****************************************************************************
-  Lowest level of resource. Contains all common functionality that
-  does not require specific typename information of instatiated types.
-*******************************************************************************/
-class ResourceInterface
-{
-public:
-  ResourceInterface() {};
-  virtual ~ResourceInterface() {};
-
-private:
-};
-
-/*!*****************************************************************************
-  Base class for resources. Statically contains templated container.
-*******************************************************************************/
+// Base class for resources. Statically contains templated container.
+///////////////////////////////////////////////////////////////////////
 template <typename T>
-class ResourceBase : public ResourceInterface
+class ResourceBase
 {
 public:
-    ResourceBase() {}
-    virtual ~ResourceBase();
+    ResourceBase() : mIsBuilt(false), mName("Unnamed Resource") {}
+    ResourceBase(const std::string &name) : mIsBuilt(false), mName(name) {}
+    virtual ~ResourceBase() {}
+
+    bool IsBuilt() { return mIsBuilt; }
+    const std::string& GetName() { return mName; }
 
     class Key
     {
@@ -47,7 +36,7 @@ public:
 
         T* operator->() { return T::Get(mID); }
 
-        inline void Destroy() { T::sResources.erase(mID); }
+        void Destroy() { T::sResources.erase(mID); }
 
     private:
         ResourceID mID;
@@ -60,13 +49,15 @@ public:
     GetResources() { return sResources; }
 
     ResourceID mID;
+    std::string mName;
 
 protected:
     inline static T* Get(ResourceID id);
     static std::unordered_map<ResourceID, std::unique_ptr<T>> sResources;
 
-private:
+    bool mIsBuilt;
     
+private:
 };
 
 } // namespace TwilliEngine

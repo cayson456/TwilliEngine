@@ -7,11 +7,11 @@ namespace TwilliEngine
 class Model : public ResourceBase<Model>
 {
 public:
-    Model();
-    ~Model();
+    Model() {}
+    Model(const std::string &name) : ResourceBase(name) {}
+    ~Model() {}
 
-    bool Build();
-    void Bind(D3D* d3d);
+    void Build();
 
     void Draw();
     void AppendMesh(Mesh::Key mesh) { mMeshes.push_back(mesh); };

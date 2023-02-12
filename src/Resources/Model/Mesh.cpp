@@ -4,78 +4,70 @@
 namespace TwilliEngine
 {
 
-Mesh::Mesh() : mIndexBuffer(nullptr), mNumIndices(0)
-{
-  for (size_t i = 0; i < VertexAttributeType::COUNT; ++i)
-    mBufferArray[i] = nullptr;
- 
-}
-
 Mesh::~Mesh()
 {
-  SafeRelease(mIndexBuffer);
+    SafeRelease(mIndexBuffer);
 
-  for (size_t i = 0; i < VertexAttributeType::COUNT; ++i)
-    SafeRelease(mBufferArray[i]);
-
+    for (size_t i = 0; i < VertexAttributeType::COUNT; ++i)
+        SafeRelease(mBufferArray[i]);
 }
 
 void Mesh::Build()
 {
-  if (mIsBuilt) {
-    err::AssertWarn(mIsBuilt, "Warning: Attempted to build an already built mesh");
-    return;
-  }
+    if (mIsBuilt) {
+        err::LogError("Warning: Attempted to build an already built mesh");
+        return;
+    }
 
-  mIsBuilt = true;
+    mIsBuilt = true;
 }
 
 void Mesh::Bind()
 {
-  size_t slot = 0;
+    if (!mIsBuilt) {
+        err::LogError("Attempted to bind an unbuilt mesh!");
+        return;
+    }
 
-  for (size_t i = 0; i < VertexAttributeType::COUNT; ++i) 
-  {
-    UINT offset = 0;
-    if (mBufferArray[i])
-      D3D::GetInstance()->mDeviceContext->IASetVertexBuffers(slot++, 1, &mBufferArray[i], &ATTRIBUTE_STRIDES[i], &offset);
-  }
+    UINT slot = 0;
 
-  D3D::GetInstance()->mDeviceContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+    for (UINT i = 0; i < VertexAttributeType::COUNT; ++i)
+    {
+        UINT offset = 0;
+        if (mBufferArray[i])
+            D3D::GetInstance()->GetContext()->IASetVertexBuffers(slot++, 1, &mBufferArray[i], &ATTRIBUTE_STRIDES[i], &offset);
+    }
+
+    D3D::GetInstance()->GetContext()->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void Mesh::CreateIndexBuffer(Face *faces, size_t num_faces)
+void Mesh::CreateIndexBuffer(const UINT *indices, UINT num_indices)
 {
-  std::vector<UINT> indices;
+    D3D11_BUFFER_DESC desc;
+    {
+        desc.ByteWidth = static_cast<UINT>(sizeof(UINT) * num_indices);
+        desc.Usage = D3D11_USAGE_IMMUTABLE;
+        desc.CPUAccessFlags = 0;
+        desc.MiscFlags = 0;
+        desc.StructureByteStride = sizeof(unsigned int);
+        desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    }
 
-  for (size_t i = 0; i < num_faces; ++i)
-  {
-    indices.push_back(faces[i].mIndices[0]);
-    indices.push_back(faces[i].mIndices[1]);
-    indices.push_back(faces[i].mIndices[2]);
-  }
+    D3D11_SUBRESOURCE_DATA res_data;
+    {
+        res_data.pSysMem = indices;
+        res_data.SysMemPitch = 0;
+        res_data.SysMemSlicePitch = 0;
+    }
 
-  D3D11_BUFFER_DESC desc;
-  {
-    desc.ByteWidth = sizeof(unsigned int) * indices.size();
-    desc.Usage = D3D11_USAGE_IMMUTABLE;
-    desc.CPUAccessFlags = 0;
-    desc.MiscFlags = 0;
-    desc.StructureByteStride = sizeof(unsigned int);
-    desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-  }
+    HRESULT hr = D3D::GetInstance()->GetDevice()->CreateBuffer(&desc, &res_data, &mIndexBuffer);
+    
+    if (!err::HRCheck(hr)) {
+        err::LogError("Unable to create index bufffer for mesh: ", mName);
+        return;
+    }
 
-  D3D11_SUBRESOURCE_DATA res_data;
-  {
-    res_data.pSysMem = indices.data();
-    res_data.SysMemPitch = 0;
-    res_data.SysMemSlicePitch = 0;
-  }
-
-  HRESULT hr = D3D::GetInstance()->mDevice->CreateBuffer(&desc, &res_data, &mIndexBuffer);
-  err::HRWarn(hr, "Warning! Unable to create a index buffer");
-
-  mNumIndices = indices.size();
+    mNumIndices = num_indices;
 }
 
 }

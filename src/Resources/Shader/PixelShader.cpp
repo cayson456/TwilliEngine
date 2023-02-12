@@ -3,42 +3,46 @@
 
 namespace TwilliEngine
 {
-PixelShader::PixelShader() : mPixelShader(nullptr)
-{
-}
 
 PixelShader::~PixelShader()
 {
     SafeRelease(mPixelShader);
 }
 
-void PixelShader::LoadShader(const std::wstring &filepath)
+void PixelShader::Build(const std::filesystem::path& filepath)
 {
-    ID3DBlob *shader_blob = nullptr;
+    ID3DBlob* shader_blob = nullptr;
 
-    if (SUCCEEDED(CompileShader(filepath, "ps_5_0", &shader_blob))) {
-        HRESULT hr = D3D::GetInstance()->mDevice->CreatePixelShader(shader_blob->GetBufferPointer(), 
-                                                                shader_blob->GetBufferSize(), NULL,
-                                                                &mPixelShader);
-
-    err::HRWarn(hr, "Warning! Could not compile shader %S", filepath.c_str());
-
-    if (SUCCEEDED(hr))
-        mIsBuilt = true;
+    if (err::HRCheck(CompileShader(filepath, "ps_5_0", &shader_blob))) {
+        HRESULT hr = D3D::GetInstance()->GetDevice()->CreatePixelShader(shader_blob->GetBufferPointer(),
+                                                                        shader_blob->GetBufferSize(), 
+                                                                        NULL, &mPixelShader);
+        if (!err::HRCheck(hr)) {
+            err::LogError("Unable to create pixel shader: ", filepath);
+            err::PrintLastWindowsError();
+            SafeRelease(shader_blob);
+        }
     }
+    else 
+        return;
+
+    SafeRelease(shader_blob);
+    
+    if (mPixelShader)
+        mIsBuilt = true;
 }
 
 void PixelShader::Bind()
 {
     if (!mIsBuilt) {
-        err::AssertWarn(false, "Warning! Attempted to bind unbuilt pixel shader");
+        err::LogError("Attempted to bind unbuilt pixel shader: ", mName);
         return;
     }
 
-    D3D::GetInstance()->mDeviceContext->PSSetShader(mPixelShader, NULL, 0);
+    D3D::GetInstance()->GetContext()->PSSetShader(mPixelShader, NULL, 0);
 
     for (auto &it : mAssignedBuffers) {
-        D3D::GetInstance()->mDeviceContext->PSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
+        D3D::GetInstance()->GetContext()->PSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
     }
 }
 

@@ -3,10 +3,13 @@
 
 namespace TwilliEngine
 {
-D3DBuffer::D3DBuffer(ID3D11Device* device, 
-                     const std::string& name, UINT byte_width) : mIsBuilt(false),
-                                                                 mByteWidth(byte_width), 
-                                                                 mBuffer(nullptr)
+
+D3DBuffer::~D3DBuffer()
+{
+    SafeRelease(mBuffer);
+}
+
+bool D3DBuffer::Build(UINT byte_width)
 {
     D3D11_BUFFER_DESC desc;
     {
@@ -17,26 +20,33 @@ D3DBuffer::D3DBuffer(ID3D11Device* device,
         desc.StructureByteStride = 0;
         desc.Usage = D3D11_USAGE_DYNAMIC;
 
-        HRESULT hr = device->CreateBuffer(&desc, nullptr, &mBuffer);
+        HRESULT hr = D3D::GetInstance()->GetDevice()->CreateBuffer(&desc, nullptr, &mBuffer);
 
-        if (err::HRCheck(hr))
+        if (err::HRCheck(hr)) {
             mIsBuilt = true;
+            mByteWidth = byte_width;
+        }
     }
+
+    return mIsBuilt;
 }
 
-D3DBuffer::~D3DBuffer()
+void D3DBuffer::MapData(void* data)
 {
-}
-
-void D3DBuffer::MapData(ID3D11DeviceContext* context, void* data)
-{
-    D3D11_MAPPED_SUBRESOURCE mapped_buffer;
-    HRESULT hr = context->Map(mBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_buffer);
-
-    if (!err::HRCheck(hr))
+    if (!mIsBuilt) {
+        err::LogError("Attempted to Map Unbuilt D3D Buffer");
         return;
+    }
+
+    D3D11_MAPPED_SUBRESOURCE mapped_buffer;
+    HRESULT hr = D3D::GetInstance()->GetContext()->Map(mBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_buffer);
+
+    if (!err::HRCheck(hr)) {
+        err::LogError("Unable to Map D3D Buffer");
+        return;
+    }
 
     std::memcpy(mapped_buffer.pData, data, mByteWidth);
-    context->Unmap(mBuffer, 0);
+    D3D::GetInstance()->GetContext()->Unmap(mBuffer, 0);
 }
 } // namespace TwilliEngine

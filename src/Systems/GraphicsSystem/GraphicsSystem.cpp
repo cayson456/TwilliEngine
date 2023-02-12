@@ -6,26 +6,15 @@ namespace TwilliEngine
 {
 GraphicsSystem::GraphicsSystem()
 {
-        // Create Main Window
-    try {
-        mWindow = std::make_unique<Window>();
-    }
-    catch (std::exception ex) {
-        err::Assert(true, "Unable to Create Main Window");
-    }
+    D3D::Initialize();
 
-        // Create Swapchain
-    try {
-        mSwapChain = std::make_unique<SwapChain>(mWindow->GetHandle());
-    }
-    catch (std::exception ex) {
-        err::Assert(true, "Unable to Create SwapChain");
-    }
+    mWindow = std::make_unique<Window>();
+    mSwapChain = std::make_unique<SwapChain>(mWindow->GetHandle());
 }
 
 GraphicsSystem::~GraphicsSystem()
 {
-
+    D3D::Shutdown();
 }
 
 void GraphicsSystem::StartFrame()

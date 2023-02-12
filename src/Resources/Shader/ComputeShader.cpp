@@ -4,52 +4,47 @@
 namespace TwilliEngine
 {
 
-ComputeShader::ComputeShader() : mComputeShader(nullptr)
-{
-}
-
 ComputeShader::~ComputeShader()
 {
     SafeRelease(mComputeShader);
 }
 
-void ComputeShader::LoadShader(const std::wstring &filepath)
+void ComputeShader::Build(const std::filesystem::path& filepath)
 {
     // Compile vertex shader
     /////////////////////////////////////////////////////
-    ID3DBlob *shader_blob = nullptr;
+    ID3DBlob* shader_blob = nullptr;
 
-    if (SUCCEEDED(CompileShader(filepath, "cs_5_0", &shader_blob))) {
-        HRESULT hr = D3D::GetInstance()->mDevice->CreateComputeShader(shader_blob->GetBufferPointer(),
-        shader_blob->GetBufferSize(), NULL,
-        &mComputeShader);
-
-        if (FAILED(hr)) {
-            err::HRWarn(hr, "WARNING: Could not compile shader %S", filepath.c_str());
+    if (err::HRCheck(CompileShader(filepath, "ps_5_0", &shader_blob))) {
+        HRESULT hr = D3D::GetInstance()->GetDevice()->CreateComputeShader(shader_blob->GetBufferPointer(),
+                                                                          shader_blob->GetBufferSize(), 
+                                                                          NULL, &mComputeShader);
+        if (!err::HRCheck(hr)) {
+            err::LogError("Unable to create compute shader: ", filepath);
+            err::PrintLastWindowsError();
             SafeRelease(shader_blob);
         }
     }
-    else {
-        err::AssertWarn(false, "WARNING:! Could not compile shader %S", filepath.c_str());
+    else 
         return;
-    }
 
     SafeRelease(shader_blob);
 
     if (mComputeShader)
-    mIsBuilt = true;
+        mIsBuilt = true;
 }
 
 void ComputeShader::Bind()
 {
     if (!mIsBuilt) {
-        err::AssertWarn(false, "WARNING: Attempted to bind unbuilt compute shader");
+        err::LogError("Attempted to bind unbuilt compute shader: ", mName);
         return;
     }
 
-    D3D::GetInstance()->mDeviceContext->CSSetShader(mComputeShader, NULL, 0);
-    for (auto &it : mAssignedBuffers) {
-        D3D::GetInstance()->mDeviceContext->CSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
+    D3D::GetInstance()->GetContext()->CSSetShader(mComputeShader, NULL, 0);
+
+    for (auto& it : mAssignedBuffers) {
+        D3D::GetInstance()->GetContext()->CSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
     }
 }
 

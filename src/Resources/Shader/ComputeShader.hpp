@@ -7,10 +7,11 @@ namespace TwilliEngine
 class ComputeShader : public Shader
 {
 public:
-    ComputeShader();
+    ComputeShader() : mComputeShader(nullptr) {}
+    ComputeShader(const std::string& name) : Shader(name), mComputeShader(nullptr) {}
     ~ComputeShader();
 
-    void LoadShader(const std::wstring &filepath) override;
+    void Build(const std::filesystem::path& filepath) override;
     void Bind() override;
 
 //    static ResourceID Create();

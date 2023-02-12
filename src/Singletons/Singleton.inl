@@ -14,7 +14,7 @@ inline void Singleton<T>::Initialize(Args&& ...args)
 }
 
 template <typename T>
-constexpr void Singleton<T>::Shutdown()
+void Singleton<T>::Shutdown()
 {
     if (!sInstance)
         err::LogError("WARNING: Attempted to an destroy an uninitialized singleton!");
@@ -23,7 +23,7 @@ constexpr void Singleton<T>::Shutdown()
 }
 
 template <typename T>
-constexpr T* Singleton<T>::GetInstance()
+T* Singleton<T>::GetInstance()
 {
     return sInstance.get();
 }

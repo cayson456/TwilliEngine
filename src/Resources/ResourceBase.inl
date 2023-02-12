@@ -6,11 +6,6 @@ template <typename T> std::unordered_map<ResourceID, std::unique_ptr<T>>
   ResourceBase<T>::sResources = std::unordered_map<ResourceID, std::unique_ptr<T>>();
 
 template <typename T>
-inline ResourceBase<T>::ResourceBase() { }
-template <typename T>
-inline ResourceBase<T>::~ResourceBase() { }
-
-template <typename T>
 template <typename... Args>
 inline ResourceID ResourceBase<T>::Create(Args&&... args)
 {

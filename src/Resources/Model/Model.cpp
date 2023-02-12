@@ -4,15 +4,29 @@
 
 namespace TwilliEngine
 {
-  Model::Model() {}
-  Model::~Model() {}
-
-  void Model::Draw()
-  {
-    for (auto &mesh : mMeshes) {
-      mesh->Bind();
-
-      D3D::GetInstance()->mDeviceContext->DrawIndexed(mesh->mNumIndices, 0, 0);
+void Model::Build()
+{
+    for (auto mesh_key : mMeshes) {
+        if (!mesh_key->IsBuilt()) {
+            err::LogError("Attempted to Build a model with an unbuilt mesh! ", mName);
+            return;
+        }
     }
-  }
+
+    mIsBuilt = true;
+}
+
+void Model::Draw()
+{
+    if (!mIsBuilt) {
+        err::LogError("Attempted to draw unbuilt model! ", mName);
+        return;
+    }
+
+    for (auto &mesh : mMeshes) {
+        mesh->Bind();
+
+        D3D::GetInstance()->GetContext()->DrawIndexed(mesh->mNumIndices, 0, 0);
+    }
+}
 }

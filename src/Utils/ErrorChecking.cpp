@@ -45,14 +45,3 @@ void err::Assert(bool condition, const std::string_view message,
     }
 #endif
 }
-
-
-void err::LogError(const std::string_view message,
-                   const std::source_location location)
-{
-    std::cerr << "file: " << location.file_name() << "("
-                          << location.line() << ":"
-                          << location.column() << ") `"
-                          << location.function_name() << "`:"
-                          << message << std::endl;
-}

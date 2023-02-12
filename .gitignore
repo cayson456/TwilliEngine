@@ -15,3 +15,7 @@
 *.vsidx
 *.db-shm
 *.ipch
+*.suo
+*.ilk
+*.idb
+*.user

@@ -6,14 +6,17 @@ namespace TwilliEngine
 class D3DBuffer : public ResourceBase<D3DBuffer>
 {
 public:
-    D3DBuffer(ID3D11Device *device, const std::string &name, UINT byte_width);
+    D3DBuffer() : mByteWidth(0), mBuffer(nullptr) {}
+    D3DBuffer(const std::string &name) : ResourceBase(name), mByteWidth(0), mBuffer(nullptr) {}
     ~D3DBuffer();
 
-    void MapData(ID3D11DeviceContext* context, void* data);
+    bool Build(UINT byte_width);
+
+    void MapData(void* data);
+
+    ID3D11Buffer* const* GetBuffer() { return &mBuffer; }
 
 private:
-    bool mIsBuilt;
-
     UINT mByteWidth;
     ID3D11Buffer* mBuffer;
 };
