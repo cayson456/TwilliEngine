@@ -1,7 +1,5 @@
 #pragma once
 #include "Systems/System.hpp"
-#include "Window.hpp"
-#include "SwapChain.hpp"
 
 namespace TwilliEngine
 {
@@ -16,8 +14,8 @@ public:
     void EndFrame();
 
 private:
-    std::unique_ptr<Window> mWindow;
-    std::unique_ptr<SwapChain> mSwapChain;
+    void InitializeImGui();
+    void ShutdownImGui();
 };
 
 } // namespace TwilliEngine

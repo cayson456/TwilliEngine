@@ -30,7 +30,7 @@ public:
 
     // Does nothing if data is null
     template <typename T>
-    void CreateVertexBuffer(VertexAttributeType type, const T *data, size_t num_elements);
+    void CreateVertexBuffer(VertexAttributeType type, const T *data, uint64_t num_elements);
     void CreateIndexBuffer(const UINT* indices, UINT num_indices);
 
     uint32_t mNumIndices;
@@ -44,7 +44,7 @@ private:
 };
 
 template<typename T>
-inline void Mesh::CreateVertexBuffer(VertexAttributeType type, const T *data, uint64_t num_elements)
+void Mesh::CreateVertexBuffer(Mesh::VertexAttributeType type, const T *data, uint64_t num_elements)
 {
     if (!data)
     return;

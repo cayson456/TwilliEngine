@@ -4,6 +4,9 @@
 #include "Systems/GraphicsSystem/GraphicsSystem.hpp"
 #include "Systems/WorldSystem/WorldSystem.hpp"
 
+#include "Singletons/SwapChain/SwapChain.hpp"
+#include "Singletons/Window/Window.hpp"
+
 namespace TwilliEngine
 {
 
@@ -11,9 +14,15 @@ bool Core::bRunning = true;
 
 void Core::Run()
 {
+    D3D::Initialize();
+    Window::Initialize();
+    SwapChain::Initialize();
+
         // Must start and loop in a specific order
     StartSystem<GraphicsSystem>();
     StartSystem<WorldSystem>();
+
+
 
     while (bRunning)
     {
@@ -21,7 +30,12 @@ void Core::Run()
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+
+            if (msg.message == WM_QUIT)
+                bRunning = false;
         }
+        if (!bRunning)
+            break;
 
         float dt = 0.016f;
         for (auto &sys : mSystems) {
@@ -45,5 +59,9 @@ void Core::Shutdown()
 {
     while (!mSystems.empty())
         mSystems.pop_back();
+
+    SwapChain::Shutdown();
+    D3D::Shutdown();
+    Window::Shutdown();
 }
 } // namespace TwilliEngine

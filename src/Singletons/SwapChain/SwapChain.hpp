@@ -1,21 +1,25 @@
 #pragma once
 #include <d3d11.h>
+#include "Singletons/Singleton.hpp"
 
 namespace TwilliEngine
 {
-class SwapChain
+class SwapChain : public Singleton<SwapChain>
 {
 public:
-    SwapChain(HWND window);
+    SwapChain();
     ~SwapChain();
 
     void BindSwapChain();
     void ClearSwapChain();
+    
+    void Present();
+    
+    void ResizeBuffers(UINT width, UINT height);
 
-    void ResizeBuffers(UINT width, UINT height, HWND window);
 private:
 
-    void CreateSwapChainBuffer(UINT width, UINT height, HWND window);
+    void CreateSwapChainBuffer(UINT width, UINT height);
     
 
     void CreateRenderTargetView();

@@ -4,6 +4,9 @@ template <typename T>
 std::unique_ptr<T> Singleton<T>::sInstance = nullptr;
 
 template <typename T>
+bool Singleton<T>::mIsInitialized = false;
+
+template <typename T>
 template <typename ...Args>
 inline void Singleton<T>::Initialize(Args&& ...args)
 {

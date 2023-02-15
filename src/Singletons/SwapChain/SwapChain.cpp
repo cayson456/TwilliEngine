@@ -1,21 +1,22 @@
 #include "precompiled.hpp"
 #include "SwapChain.hpp"
 
+#include "Singletons/Window/Window.hpp"
 
 namespace TwilliEngine {
 
-SwapChain::SwapChain(HWND window) : mSwapChain(nullptr),
-                                    mRenderTargetView(nullptr),
-                                    mDepthStencilBuffer(nullptr),
-                                    mDepthStencilState(nullptr),
-                                    mDepthStencilView(nullptr),
-                                    mRasterizerState(nullptr),
-                                    mBlendState(nullptr)
+SwapChain::SwapChain() : mSwapChain(nullptr),
+                         mRenderTargetView(nullptr),
+                         mDepthStencilBuffer(nullptr),
+                         mDepthStencilState(nullptr),
+                         mDepthStencilView(nullptr),
+                         mRasterizerState(nullptr),
+                         mBlendState(nullptr)
                                                             
 {
 
         // Initialize Everything
-    CreateSwapChainBuffer(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), window);
+    CreateSwapChainBuffer(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
     CreateRenderTargetView();
     CreateRasterizerState();
     CreateDepthStencilState();
@@ -23,6 +24,8 @@ SwapChain::SwapChain(HWND window) : mSwapChain(nullptr),
     CreateDepthStencilView();
     CreateBlendState();
     SetViewport(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+
+    mIsInitialized = true;
 }
 
 SwapChain::~SwapChain()
@@ -49,14 +52,30 @@ void SwapChain::ClearSwapChain()
     D3D::GetInstance()->GetContext()->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
-void SwapChain::ResizeBuffers(UINT width, UINT height, HWND window)
+void SwapChain::Present()
 {
-    CreateSwapChainBuffer(width, height, window);
-    CreateDepthBuffer(width, height);
+    mSwapChain->Present(1, 0);
+}
+
+void SwapChain::ResizeBuffers(UINT width, UINT height)
+{
+    if (!mSwapChain)
+        return;
+
+    BindSwapChain();
+    SafeRelease(mRenderTargetView);
+
+    HRESULT hr = mSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+    err::Assert(err::HRCheck(hr), " Unable to Resize SwapChain Buffer");
+    
+    CreateRenderTargetView();
+    CreateDepthStencilView();
+
+    BindSwapChain();
     SetViewport(width, height);
 }
 
-void SwapChain::CreateSwapChainBuffer(UINT width, UINT height, HWND window)
+void SwapChain::CreateSwapChainBuffer(UINT width, UINT height)
 {
     SafeRelease(mSwapChain);
 
@@ -69,7 +88,6 @@ void SwapChain::CreateSwapChainBuffer(UINT width, UINT height, HWND window)
     {
         ZeroMemory(&sd, sizeof(sd));
 
-        sd.BufferCount = 1;
         sd.Width = width;
         sd.Height = height;
         sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -94,7 +112,7 @@ void SwapChain::CreateSwapChainBuffer(UINT width, UINT height, HWND window)
     err::Assert(err::HRCheck(pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pIDXGIFactory)),
                 "Unable to create Swap Chain Buffer");
 
-    err::Assert(err::HRCheck(pIDXGIFactory->CreateSwapChainForHwnd(D3D::GetInstance()->GetDevice(), window, &sd, NULL, NULL, &mSwapChain)),
+    err::Assert(err::HRCheck(pIDXGIFactory->CreateSwapChainForHwnd(D3D::GetInstance()->GetDevice(), Window::GetInstance()->GetHandle(), &sd, NULL, NULL, &mSwapChain)),
                 "Unable to create Swap Chain Buffer");
 }
 void SwapChain::CreateRenderTargetView()

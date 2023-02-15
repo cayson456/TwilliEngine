@@ -3,7 +3,12 @@
 #include "DirectXTK/Mouse.h"
 
 #include "Window.hpp"
+#include "Singletons/SwapChain/SwapChain.hpp"
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_win32.h>
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace TwilliEngine {
 
@@ -13,12 +18,13 @@ Window::Window(UINT screen_width, UINT screen_height,
                                                  mScreenSize({screen_width, screen_height}),
                                                  mResolution({resolution_width, resolution_height})                                        
 {
+    
 
         // Main Window Class
     WNDCLASSEX wc;
     {
         wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-        wc.lpfnWndProc = &ProcessMessage;
+        wc.lpfnWndProc = reinterpret_cast<WNDPROC>(&ProcessMessage);
         wc.cbClsExtra = 0;
         wc.cbWndExtra = 0;
         wc.hInstance = GetModuleHandle(NULL);
@@ -46,6 +52,8 @@ Window::Window(UINT screen_width, UINT screen_height,
 
     ShowWindow(mWindowHandle, SW_SHOW);
     UpdateWindow(mWindowHandle);
+
+    mIsInitialized = true;
 }
 
 Window::~Window()
@@ -56,6 +64,8 @@ Window::~Window()
 
 LRESULT Window::ProcessMessage(HWND hwnd, UINT msg, WPARAM WParam, LPARAM LParam)
 {
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, WParam, LParam))
+        return true;
 
     switch (msg) {
     case WM_ACTIVATEAPP:
@@ -90,7 +100,14 @@ LRESULT Window::ProcessMessage(HWND hwnd, UINT msg, WPARAM WParam, LPARAM LParam
         break;
 
     case WM_SIZE:
+    {
+        UINT width = LOWORD(LParam);
+        UINT height = HIWORD(LParam);
 
+        if (SwapChain::IsInitialized())
+            SwapChain::GetInstance()->ResizeBuffers(width, height);
+        break;
+    }
     default:
         break;
     }

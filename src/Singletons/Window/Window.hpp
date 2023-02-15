@@ -1,7 +1,8 @@
 #pragma once
+#include "Singletons/Singleton.hpp"
 
 namespace TwilliEngine {
-class Window
+class Window : public Singleton<Window>
 {
 public:
     Window(UINT screen_width = GetSystemMetrics(SM_CXSCREEN),
@@ -14,6 +15,7 @@ public:
     static LRESULT ProcessMessage(HWND hwnd, UINT msg, WPARAM WParam, LPARAM LParam);
 
     HWND GetHandle() const { return mWindowHandle; }
+
 private:
     HWND mWindowHandle;
     

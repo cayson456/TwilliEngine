@@ -17,8 +17,14 @@ public:
     static void Shutdown();
     static T* GetInstance();
 
+    static bool IsInitialized() { return mIsInitialized; }
+
+protected: 
+    static bool mIsInitialized;
+
 private:
     static std::unique_ptr<T> sInstance;
+    
 };
 
 }

@@ -99,8 +99,10 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
         Mesh::Key new_mesh = Mesh::Create(mesh_name);
 
             // 00-07 - Num Verts (uint64_t)
-        uint64_t num_verts;
-        model_file.GetBytes(&num_verts);
+        uint64_t num_verts_;
+        model_file.GetBytes(&num_verts_);
+
+        size_t num_verts = static_cast<size_t>(num_verts_);
 
         new_mesh->mHasVertexAttribute[Mesh::VertexAttributeType::Position] = true;
 
@@ -155,8 +157,8 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
         // ALl indicies
         uint64_t num_indices = 0;
         model_file.GetBytes(&num_indices);
-        std::vector<uint32_t> indices(num_indices);
-        model_file.GetBytes(indices.data(), num_indices * sizeof(uint32_t));
+        std::vector<uint32_t> indices(static_cast<size_t>(num_indices));
+        model_file.GetBytes(indices.data(), static_cast<size_t>(num_indices) * sizeof(uint32_t));
 
         new_mesh->CreateIndexBuffer(indices.data(), static_cast<uint32_t>(num_indices));
         new_mesh->mNumIndices = static_cast<uint32_t>(num_indices);

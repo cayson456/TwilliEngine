@@ -42,6 +42,8 @@ D3D::D3D() : mDevice(nullptr), mDeviceContext(nullptr),
             break;
         }
     }
+
+    mIsInitialized = true;
 }
 
 D3D::~D3D()
