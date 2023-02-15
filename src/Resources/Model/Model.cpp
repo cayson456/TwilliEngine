@@ -4,6 +4,13 @@
 
 namespace TwilliEngine
 {
+Model::~Model()
+{
+    for (auto mesh : mMeshes) {
+        mesh.Destroy();
+    }
+}
+
 void Model::Build()
 {
     for (auto mesh_key : mMeshes) {

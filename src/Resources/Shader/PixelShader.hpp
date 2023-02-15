@@ -4,14 +4,14 @@
 namespace TwilliEngine
 {
 
-class PixelShader : public Shader
+class PixelShader : public Shader, public ResourceBase<PixelShader>
 {
 public:
     PixelShader() : mPixelShader(nullptr) {}
-    PixelShader(const std::string& name) : Shader(name), mPixelShader(nullptr) {}
+    PixelShader(const std::string& name) : ResourceBase(name), mPixelShader(nullptr) {}
     ~PixelShader();
 
-    void Build(const std::filesystem::path& filepath) override;
+    bool Build(const std::filesystem::path& filepath) override;
     void Bind() override;
 
   //  static ResourceID Create();

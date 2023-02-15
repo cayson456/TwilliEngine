@@ -6,7 +6,7 @@ void ResourceID::GenerateNewID()
     std::generate(mBytes, mBytes + ID_SIZE, GenerateByte);
 }
 
-ResourceID& ResourceID::operator=(const ResourceID &rhs)
+ResourceID& ResourceID::operator=(const ResourceID &rhs) noexcept
 {
     std::memcpy(mBytes, rhs.mBytes, ID_SIZE);
     return *this;

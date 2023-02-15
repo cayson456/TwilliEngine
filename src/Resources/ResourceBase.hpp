@@ -18,7 +18,6 @@ public:
     virtual ~ResourceBase() {}
 
     bool IsBuilt() { return mIsBuilt; }
-    const std::string& GetName() { return mName; }
 
     class Key
     {
@@ -43,10 +42,14 @@ public:
     };
 
     template <typename... Args>
-    inline static ResourceID Create(Args&&...args);
+    static ResourceID Create(Args&&...args);
 
     static std::unordered_map<ResourceID, std::unique_ptr<T>>&
     GetResources() { return sResources; }
+
+    static Key GetResourceWithName(std::string_view name);
+
+    static Key NullKey;
 
     ResourceID mID;
     std::string mName;

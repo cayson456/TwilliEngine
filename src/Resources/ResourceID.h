@@ -7,10 +7,10 @@ public:
 
     void GenerateNewID();
 
-    ResourceID& operator=(const ResourceID &rhs);
+    ResourceID& operator=(const ResourceID& rhs) noexcept;
     bool operator==(const ResourceID &rhs) const;
 
-    static const uint32_t ID_SIZE = 128;
+    static const uint32_t ID_SIZE = 64;
     unsigned char mBytes[ID_SIZE];
 
 private:

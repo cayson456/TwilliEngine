@@ -11,6 +11,11 @@ D3DBuffer::~D3DBuffer()
 
 bool D3DBuffer::Build(UINT byte_width)
 {
+    if (mIsBuilt) {
+        err::LogError("Attempted to build already built buffer ", mName);
+        return false;
+    }
+
     D3D11_BUFFER_DESC desc;
     {
         desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -49,4 +54,5 @@ void D3DBuffer::MapData(void* data)
     std::memcpy(mapped_buffer.pData, data, mByteWidth);
     D3D::GetInstance()->GetContext()->Unmap(mBuffer, 0);
 }
+
 } // namespace TwilliEngine

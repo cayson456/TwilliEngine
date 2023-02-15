@@ -1,6 +1,7 @@
 #pragma once
 #include "Systems/System.hpp"
-#include <direct.h>
+
+#include "ResourceLoader.hpp"
 
 namespace TwilliEngine
 {
@@ -15,13 +16,8 @@ public:
     void EndFrame();
 
 private:
+    std::unique_ptr<ResourceLoader> mResourceLoader;
     
-    
-    LRESULT ProcessMessage(HWND hwnd, UINT msg, WPARAM WParam, LPARAM LParam);
-
-        // Register Window Classes in Input System because it needs the 
-    void RegisterWindowClasses();
-    void UnregisterWindowClasses();
 };
 
 } // namespace TwilliEngine

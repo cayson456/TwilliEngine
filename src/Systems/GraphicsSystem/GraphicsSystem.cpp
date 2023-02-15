@@ -12,7 +12,7 @@ GraphicsSystem::GraphicsSystem()
     mSwapChain = std::make_unique<SwapChain>(mWindow->GetHandle());
 }
 
-GraphicsSystem::~GraphicsSystem()
+GraphicsSystem::~GraphicsSystem() noexcept
 {
     D3D::Shutdown();
 }

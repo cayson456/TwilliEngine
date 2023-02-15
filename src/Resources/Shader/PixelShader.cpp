@@ -9,27 +9,29 @@ PixelShader::~PixelShader()
     SafeRelease(mPixelShader);
 }
 
-void PixelShader::Build(const std::filesystem::path& filepath)
+bool PixelShader::Build(const std::filesystem::path& filepath)
 {
     ID3DBlob* shader_blob = nullptr;
-
-    if (err::HRCheck(CompileShader(filepath, "ps_5_0", &shader_blob))) {
-        HRESULT hr = D3D::GetInstance()->GetDevice()->CreatePixelShader(shader_blob->GetBufferPointer(),
-                                                                        shader_blob->GetBufferSize(), 
-                                                                        NULL, &mPixelShader);
-        if (!err::HRCheck(hr)) {
-            err::LogError("Unable to create pixel shader: ", filepath);
-            err::PrintLastWindowsError();
-            SafeRelease(shader_blob);
-        }
-    }
-    else 
-        return;
-
-    SafeRelease(shader_blob);
     
-    if (mPixelShader)
-        mIsBuilt = true;
+    HRESULT hr = CompileShader(filepath, "ps_5_0", &shader_blob);
+    if (!err::HRCheck(hr))
+        return false; 
+    
+
+    hr = D3D::GetInstance()->GetDevice()->CreatePixelShader(shader_blob->GetBufferPointer(),
+                                                                        shader_blob->GetBufferSize(), 
+                                                                    NULL, &mPixelShader);
+    if (!err::HRCheck(hr)) {
+        err::LogError("Unable to create pixel shader: ", filepath);
+        err::PrintLastWindowsError();
+        SafeRelease(shader_blob);
+        return false;
+    }
+    
+    SafeRelease(shader_blob);
+    SearchAndAssignBuffers(filepath);
+
+    return mIsBuilt = true;
 }
 
 void PixelShader::Bind()

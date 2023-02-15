@@ -131,7 +131,8 @@ workspace "TwilliEngine"
     links {
       "d3d11",
       "d3dcompiler",
-      "/DirectXTK/%{cfg.platform}_%{cfg.buildcfg}/DirectXTK"
+      "/DirectXTK/%{cfg.platform}_%{cfg.buildcfg}/DirectXTK",
+      "/LZ4/%{cfg.platform}_%{cfg.buildcfg}/liblz4_static"
     }
 
     prebuildcommands {}

@@ -9,29 +9,30 @@ ComputeShader::~ComputeShader()
     SafeRelease(mComputeShader);
 }
 
-void ComputeShader::Build(const std::filesystem::path& filepath)
+bool ComputeShader::Build(const std::filesystem::path& filepath)
 {
     // Compile vertex shader
     /////////////////////////////////////////////////////
     ID3DBlob* shader_blob = nullptr;
 
-    if (err::HRCheck(CompileShader(filepath, "ps_5_0", &shader_blob))) {
-        HRESULT hr = D3D::GetInstance()->GetDevice()->CreateComputeShader(shader_blob->GetBufferPointer(),
+    HRESULT hr = CompileShader(filepath, "cs_5_0", &shader_blob);
+    if (!err::HRCheck(hr))
+        return false;
+
+    hr = D3D::GetInstance()->GetDevice()->CreateComputeShader(shader_blob->GetBufferPointer(),
                                                                           shader_blob->GetBufferSize(), 
                                                                           NULL, &mComputeShader);
-        if (!err::HRCheck(hr)) {
-            err::LogError("Unable to create compute shader: ", filepath);
-            err::PrintLastWindowsError();
-            SafeRelease(shader_blob);
-        }
+    if (!err::HRCheck(hr)) {
+        err::LogError("Unable to create compute shader: ", filepath);
+        err::PrintLastWindowsError();
+        SafeRelease(shader_blob);
+        return false;
     }
-    else 
-        return;
 
     SafeRelease(shader_blob);
+    SearchAndAssignBuffers(filepath);
 
-    if (mComputeShader)
-        mIsBuilt = true;
+    return mIsBuilt = true;
 }
 
 void ComputeShader::Bind()

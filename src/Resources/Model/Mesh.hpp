@@ -6,8 +6,8 @@ namespace TwilliEngine
 class Mesh : public ResourceBase<Mesh>
 {
 public:
-    Mesh() : mIndexBuffer(nullptr), mBufferArray(), mNumIndices(0) {}
-    Mesh(const std::string& name) : ResourceBase(name), mIndexBuffer(nullptr), mBufferArray(), mNumIndices(0) {}
+    Mesh() : mIndexBuffer(nullptr), mBufferArray(), mHasVertexAttribute(), mNumIndices(0), mHasDeformer(false) {}
+    Mesh(const std::string& name) : ResourceBase(name), mIndexBuffer(nullptr), mBufferArray(), mHasVertexAttribute(), mNumIndices(0), mHasDeformer(false) {}
     ~Mesh();
   
     void Build();
@@ -18,6 +18,8 @@ public:
         Position,
         Normal,
         UV,
+        Tangent,
+        Binormal,
         COUNT
     };
 
@@ -31,28 +33,29 @@ public:
     void CreateVertexBuffer(VertexAttributeType type, const T *data, size_t num_elements);
     void CreateIndexBuffer(const UINT* indices, UINT num_indices);
 
-    UINT mNumIndices;
+    uint32_t mNumIndices;
 
+    bool mHasDeformer;
+    bool mHasVertexAttribute[VertexAttributeType::COUNT];
+ 
 private:
     ID3D11Buffer *mIndexBuffer;
     ID3D11Buffer* mBufferArray[VertexAttributeType::COUNT];
-
-    bool mIsBuilt;
 };
 
 template<typename T>
-inline void Mesh::CreateVertexBuffer(VertexAttributeType type, const T *data, size_t num_elements)
+inline void Mesh::CreateVertexBuffer(VertexAttributeType type, const T *data, uint64_t num_elements)
 {
     if (!data)
     return;
 
     D3D11_BUFFER_DESC desc;
     {
-        desc.ByteWidth = num_elements * sizeof(T);
+        desc.ByteWidth = static_cast<UINT>(num_elements) * ATTRIBUTE_STRIDES[type];
         desc.Usage = D3D11_USAGE_IMMUTABLE;
         desc.CPUAccessFlags = 0;
         desc.MiscFlags = 0;
-        desc.StructureByteStride = sizeof(T);
+        desc.StructureByteStride = ATTRIBUTE_STRIDES[type];
         desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     }
 
@@ -63,7 +66,7 @@ inline void Mesh::CreateVertexBuffer(VertexAttributeType type, const T *data, si
         res_data.SysMemSlicePitch = 0;
     }
 
-    HRESULT hr = D3D::GetInstance()->mDevice->CreateBuffer(&desc, &res_data, &mBufferArray[type]);
+    HRESULT hr = D3D::GetInstance()->GetDevice()->CreateBuffer(&desc, &res_data, &mBufferArray[type]);
     if (!err::HRCheck(hr)) {
         err::LogError("Unable to create vertex bufffer for mesh: ", mName);
         return;

@@ -16,7 +16,6 @@ public:
 
 private:
 
-
     template <typename T>
     inline void StartSystem();
 

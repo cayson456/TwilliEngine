@@ -5,6 +5,9 @@ namespace TwilliEngine
 template <typename T> std::unordered_map<ResourceID, std::unique_ptr<T>>
   ResourceBase<T>::sResources = std::unordered_map<ResourceID, std::unique_ptr<T>>();
 
+template <typename T> 
+ResourceBase<T>::Key ResourceBase<T>::NullKey = ResourceBase<T>::Key();
+
 template <typename T>
 template <typename... Args>
 inline ResourceID ResourceBase<T>::Create(Args&&... args)
@@ -19,6 +22,17 @@ inline ResourceID ResourceBase<T>::Create(Args&&... args)
         it->second.get()->mID = resource_id;
     
     return resource_id;
+}
+
+template <typename T>
+ResourceBase<T>::Key ResourceBase<T>::GetResourceWithName(std::string_view name)
+{
+    for (auto& res : T::sResources) {
+        if (res.second->mName.compare(name) == 0)
+            return res.first;
+    }
+
+    return T::NullKey;
 }
 
 template <typename T>

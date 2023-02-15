@@ -47,7 +47,7 @@ static constexpr D3D11_INPUT_ELEMENT_DESC gInputLayoutElements[TwilliEngine::Mes
     }
 };
 
-static const std::string INPUT_LAYOUT_PATH = "../src/Shaders/InputLayouts/";
+static const std::string INPUT_LAYOUT_PATH = "../assets/Shaders/InputLayouts/";
 
 namespace TwilliEngine
 {
@@ -58,24 +58,26 @@ VertexShader::~VertexShader()
     SafeRelease(mVertexShader);
 }
 
-void VertexShader::Build(const std::filesystem::path& filepath)
+bool VertexShader::Build(const std::filesystem::path& filepath)
 {
     // Compile vertex shader
     /////////////////////////////////////////////////////
     ID3DBlob* shader_blob = nullptr;
 
-    if (err::HRCheck(CompileShader(filepath, "vs_5_0", &shader_blob))) {
-        HRESULT hr = D3D::GetInstance()->GetDevice()->CreateVertexShader(shader_blob->GetBufferPointer(),
-                                                                         shader_blob->GetBufferSize(), 
-                                                                         NULL, &mVertexShader);
-        if (!err::HRCheck(hr)) {
-            err::LogError("Unable to create vertex shader: ", filepath);
-            err::PrintLastWindowsError();
-            SafeRelease(shader_blob);
-        }
+    HRESULT hr = CompileShader(filepath, "vs_5_0", &shader_blob);
+
+    if (!err::HRCheck(hr))
+        return false;
+
+    hr = D3D::GetInstance()->GetDevice()->CreateVertexShader(shader_blob->GetBufferPointer(),
+                                                             shader_blob->GetBufferSize(), 
+                                                             NULL, &mVertexShader);
+    if (!err::HRCheck(hr)) {
+        err::LogError("Unable to create vertex shader: ", filepath);
+        err::PrintLastWindowsError();
+        SafeRelease(shader_blob);
+        return false;
     }
-    else 
-        return;
 
     // Search for input layout to create it
     // We determine the input layout based on what the shader includes at the top
@@ -105,8 +107,14 @@ void VertexShader::Build(const std::filesystem::path& filepath)
     CreateInputLayout(input_layout_filename, shader_blob);
     SafeRelease(shader_blob);
 
-    if (mInputLayout && mVertexShader)
-        mIsBuilt = true;
+    if (!mInputLayout)
+        return false;
+
+    in_file.close();
+    SearchAndAssignBuffers(filepath);
+
+
+    return mIsBuilt = true;
 }
 
 void VertexShader::Bind()
@@ -135,7 +143,7 @@ ResourceID VertexShader::Create()
 }
 */
 
-void VertexShader::CreateInputLayout(const std::string &filename, ID3DBlob *vertex_shader)
+bool VertexShader::CreateInputLayout(const std::string &filename, ID3DBlob *vertex_shader)
 {
     // Parse input layout definition
     //////////////////////////////////////////////////////
@@ -144,7 +152,7 @@ void VertexShader::CreateInputLayout(const std::string &filename, ID3DBlob *vert
 
     if (!in_file.is_open()) {
         err::LogError("Unable to open file to create Input Layout: ", filename);
-        return;
+        return false;
     }
 
     str_stream << in_file.rdbuf();
@@ -171,7 +179,12 @@ void VertexShader::CreateInputLayout(const std::string &filename, ID3DBlob *vert
                                                                     vertex_shader->GetBufferSize(),
                                                                     &mInputLayout);
 
-    if (!err::HRCheck(hr))
+    if (!err::HRCheck(hr)) {
         err::LogError("Warning! Unable to create Input Layout: ", filename);
+        SafeRelease(mInputLayout);
+        return false;
+    }
+
+    return true;
 }
 }

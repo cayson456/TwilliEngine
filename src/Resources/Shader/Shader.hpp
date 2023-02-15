@@ -7,15 +7,16 @@
 
 namespace TwilliEngine
 {
-class Shader : public ResourceBase<Shader>
+class Shader
 {
 public:
     Shader() {}
-    Shader(const std::string &name) : ResourceBase(name) {}
     ~Shader() {}
 
-    virtual void Build(const std::filesystem::path& filepath) = 0;
+    virtual bool Build(const std::filesystem::path& filepath) = 0;
     virtual void Bind() = 0;
+
+    void AssignBuffer(UINT slot, D3DBuffer::Key buffer);
 
     enum Type
     {
@@ -26,6 +27,9 @@ public:
     };
 
 protected:
+    void SearchAndAssignBuffers(const std::filesystem::path& filepath);
+    
+
     HRESULT CompileShader(const std::filesystem::path& filepath, LPCSTR profile, ID3DBlob** blob);
 
     std::map<UINT, D3DBuffer::Key> mAssignedBuffers;

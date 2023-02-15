@@ -2,6 +2,7 @@
 #include "Core.hpp"
 
 #include "Systems/GraphicsSystem/GraphicsSystem.hpp"
+#include "Systems/WorldSystem/WorldSystem.hpp"
 
 namespace TwilliEngine
 {
@@ -12,6 +13,7 @@ void Core::Run()
 {
         // Must start and loop in a specific order
     StartSystem<GraphicsSystem>();
+    StartSystem<WorldSystem>();
 
     while (bRunning)
     {

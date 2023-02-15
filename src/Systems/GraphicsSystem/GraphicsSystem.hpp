@@ -9,7 +9,7 @@ class GraphicsSystem : public System
 {
 public:
     GraphicsSystem();
-    ~GraphicsSystem();
+    ~GraphicsSystem() noexcept;
 
     void StartFrame();
     void Update(float dt);
