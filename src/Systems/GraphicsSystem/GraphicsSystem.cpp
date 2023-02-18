@@ -84,8 +84,6 @@ void GraphicsSystem::ShutdownImGui()
     ImGui_ImplWin32_Shutdown();
 
     ImGui::DestroyContext();
-
-
 }
 
 } // namespace TwilliEngine

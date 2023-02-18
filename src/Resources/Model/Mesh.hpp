@@ -7,7 +7,7 @@ class Mesh : public ResourceBase<Mesh>
 {
 public:
     Mesh() : mIndexBuffer(nullptr), mBufferArray(), mHasVertexAttribute(), mNumIndices(0), mHasDeformer(false) {}
-    Mesh(const std::string& name) : ResourceBase(name), mIndexBuffer(nullptr), mBufferArray(), mHasVertexAttribute(), mNumIndices(0), mHasDeformer(false) {}
+    Mesh(std::string_view name) : ResourceBase(name), mIndexBuffer(nullptr), mBufferArray(), mHasVertexAttribute(), mNumIndices(0), mHasDeformer(false) {}
     ~Mesh();
   
     void Build();

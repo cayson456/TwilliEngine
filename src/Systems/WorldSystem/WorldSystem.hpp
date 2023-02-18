@@ -1,7 +1,8 @@
 #pragma once
 #include "Systems/System.hpp"
 
-#include "ResourceLoader.hpp"
+#include "Scenes/Scene.hpp"
+#include "ResourceLoader/ResourceLoader.hpp"
 
 namespace TwilliEngine
 {
@@ -15,9 +16,30 @@ public:
     void Update(float dt);
     void EndFrame();
 
+    template <typename T>
+    void LoadScene();
+
 private:
+    std::unique_ptr<Scene> mLoadedScene;
     std::unique_ptr<ResourceLoader> mResourceLoader;
-    
 };
+
+
+template<typename T>
+void WorldSystem::LoadScene()
+{
+    if (!std::is_base_of<Scene, T>()) {
+        err::LogError("Error, attempted to load a scene when it's not a scene: ", typeid(T).name());
+        return;
+    }
+
+    try {
+        mLoadedScene = std::make_unique<T>();
+    }
+    catch (std::exception ex) {
+        err::LogError("Error, unable to load scene: ", typeid(T).name());
+        return;
+    }
+}
 
 } // namespace TwilliEngine

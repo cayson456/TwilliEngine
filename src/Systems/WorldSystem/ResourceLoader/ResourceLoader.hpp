@@ -21,9 +21,9 @@ public:
     D3DBuffer::Key LoadConstantBuffer(const std::filesystem::path& path);
 
 private:
-
-    void LoadAllConstantBuffers();
     void LoadAllModels();
+    void LoadAllShaderPrograms();
+    void LoadAllConstantBuffers();
 };
 
 

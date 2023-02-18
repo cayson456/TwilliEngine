@@ -1,7 +1,7 @@
 #include "precompiled.hpp"
-#include "SceneLoader.hpp"
+#include "Component.hpp"
 
 namespace TwilliEngine
 {
 
-} // namespace TwilliEngine
+}

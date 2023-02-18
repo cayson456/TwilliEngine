@@ -8,7 +8,7 @@ class Model : public ResourceBase<Model>
 {
 public:
     Model() : mHasSkeleton(false) {}
-    Model(const std::string &name) : ResourceBase(name), mHasSkeleton(false) {}
+    Model(std::string_view name) : ResourceBase(name), mHasSkeleton(false) {}
     ~Model();
 
     void Build();

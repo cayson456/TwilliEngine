@@ -8,7 +8,7 @@ class ComputeShader : public Shader, public ResourceBase<ComputeShader>
 {
 public:
     ComputeShader() : mComputeShader(nullptr) {}
-    ComputeShader(const std::string& name) : ResourceBase(name), mComputeShader(nullptr) {}
+    ComputeShader(std::string_view name) : ResourceBase(name), mComputeShader(nullptr) {}
     ~ComputeShader();
 
     bool Build(const std::filesystem::path& filepath) override;

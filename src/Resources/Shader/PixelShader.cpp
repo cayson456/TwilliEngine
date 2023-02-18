@@ -14,9 +14,12 @@ bool PixelShader::Build(const std::filesystem::path& filepath)
     ID3DBlob* shader_blob = nullptr;
     
     HRESULT hr = CompileShader(filepath, "ps_5_0", &shader_blob);
-    if (!err::HRCheck(hr))
-        return false; 
-    
+    if (!err::HRCheck(hr)) {
+        err::LogError("Unable to create pixel shader: ", filepath);
+        err::PrintLastWindowsError();
+        SafeRelease(shader_blob);
+        return false;
+    }
 
     hr = D3D::GetInstance()->GetDevice()->CreatePixelShader(shader_blob->GetBufferPointer(),
                                                                         shader_blob->GetBufferSize(), 

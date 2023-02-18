@@ -14,7 +14,7 @@ class ResourceBase
 {
 public:
     ResourceBase() : mIsBuilt(false), mName("Unnamed Resource") {}
-    ResourceBase(const std::string &name) : mIsBuilt(false), mName(name) {}
+    ResourceBase(std::string_view name) : mIsBuilt(false), mName(name) {}
     virtual ~ResourceBase() {}
 
     bool IsBuilt() { return mIsBuilt; }

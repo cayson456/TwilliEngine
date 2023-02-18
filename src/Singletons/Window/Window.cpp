@@ -10,7 +10,8 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-namespace TwilliEngine {
+namespace TwilliEngine 
+{
 
 Window::Window(UINT screen_width, UINT screen_height,
                UINT resolution_width, UINT resolution_height,
@@ -18,8 +19,6 @@ Window::Window(UINT screen_width, UINT screen_height,
                                                  mScreenSize({screen_width, screen_height}),
                                                  mResolution({resolution_width, resolution_height})                                        
 {
-    
-
         // Main Window Class
     WNDCLASSEX wc;
     {
@@ -114,6 +113,4 @@ LRESULT Window::ProcessMessage(HWND hwnd, UINT msg, WPARAM WParam, LPARAM LParam
 
     return DefWindowProc(hwnd, msg, WParam, LParam);
 }
-
-
 } // namespace TwilliEngine

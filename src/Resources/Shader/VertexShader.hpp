@@ -10,7 +10,7 @@ class VertexShader : public Shader, public ResourceBase<VertexShader>
 {
 public:
     VertexShader() : mInputLayout(nullptr), mVertexShader(nullptr) {}
-    VertexShader(const std::string& name) : ResourceBase(name), mInputLayout(nullptr), mVertexShader(nullptr) {}
+    VertexShader(std::string_view name) : ResourceBase(name), mInputLayout(nullptr), mVertexShader(nullptr) {}
     ~VertexShader();
 
     bool Build(const std::filesystem::path& filepath) override;

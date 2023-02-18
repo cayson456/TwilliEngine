@@ -29,4 +29,5 @@
 #include "Utils/Constants.hpp"
 #include "Utils/D3DSafeRelease.hpp"
 
+#include <DirectXMath.h>
 #include "Singletons/D3D/D3D.hpp"

@@ -12,7 +12,7 @@ class ShaderProgram : public ResourceBase<ShaderProgram>
 {
 public:
     ShaderProgram() {}
-    ShaderProgram(const std::string &name) : ResourceBase(name) {}
+    ShaderProgram(std::string_view name) : ResourceBase(name) {}
     ~ShaderProgram() {}
   
     bool Build();

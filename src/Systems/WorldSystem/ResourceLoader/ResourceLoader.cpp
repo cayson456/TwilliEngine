@@ -17,9 +17,9 @@ namespace
 
     const std::string RESOURCE_PATH = "../assets/";
     const std::string SHADER_PATH = RESOURCE_PATH + "Shaders/";
-    const std::string CONSTANT_BUFFER_PATH = SHADER_PATH + "ConstantBuffers/";
     const std::string MODEL_PATH = RESOURCE_PATH + "Models/";
-
+    const std::string SHADER_PROGRAM_PATH = SHADER_PATH + "ShaderPrograms/";
+    const std::string CONSTANT_BUFFER_PATH = SHADER_PATH + "ConstantBuffers/";
 }
 
 
@@ -35,8 +35,9 @@ namespace TwilliEngine
 
 void ResourceLoader::LoadAllAssetsInFolder()
 {
-    LoadAllConstantBuffers();
     LoadAllModels();
+    LoadAllConstantBuffers();
+    LoadAllShaderPrograms();
 }
 
 void ResourceLoader::UnloadAllAssets()
@@ -305,15 +306,6 @@ D3DBuffer::Key ResourceLoader::LoadConstantBuffer(const std::filesystem::path &f
     return D3DBuffer::NullKey;
 }
 
-void ResourceLoader::LoadAllConstantBuffers()
-{
-    for (auto& file : std::filesystem::recursive_directory_iterator(CONSTANT_BUFFER_PATH)) {
-        if (file.path().extension() == ".hlsl") {
-            LoadConstantBuffer(file);
-        }
-    }
-}
-
 void ResourceLoader::LoadAllModels()
 {
     for (auto& file : std::filesystem::recursive_directory_iterator(MODEL_PATH)) {
@@ -323,4 +315,21 @@ void ResourceLoader::LoadAllModels()
     }
 }
 
+void ResourceLoader::LoadAllShaderPrograms()
+{
+    for (auto& file : std::filesystem::recursive_directory_iterator(SHADER_PROGRAM_PATH)) {
+        if (file.is_directory()) {
+            LoadShaderProgram(file);
+        }
+    }
+}
+
+void ResourceLoader::LoadAllConstantBuffers()
+{
+    for (auto& file : std::filesystem::recursive_directory_iterator(CONSTANT_BUFFER_PATH)) {
+        if (file.path().extension() == ".hlsl") {
+            LoadConstantBuffer(file);
+        }
+    }
+}
 }

@@ -1,0 +1,14 @@
+struct FSQ_Vertex
+{
+	float4 pos : SV_POSITION;
+	float2 uv  : TEXCOORD;
+};
+
+Texture2D<float4> gTexture : register(t0);
+SamplerState gSampler : register(s0);
+
+float4 main(FSQ_Vertex vin) : SV_TARGET
+{
+  float3 texel = gTexture.Sample(gSampler, vin.uv).xyz / 100.0f;
+  return float4(texel.x, texel.x, texel.x, 1.0f) ;
+}
