@@ -44,6 +44,24 @@ static constexpr D3D11_INPUT_ELEMENT_DESC gInputLayoutElements[TwilliEngine::Mes
         D3D11_APPEND_ALIGNED_ELEMENT,
         D3D11_INPUT_PER_VERTEX_DATA,
         0
+    },
+    {
+        "TANGENT",
+        0,
+        DXGI_FORMAT_R32G32B32_FLOAT,
+        0,
+        D3D11_APPEND_ALIGNED_ELEMENT,
+        D3D11_INPUT_PER_VERTEX_DATA,
+        0
+    },
+    {
+        "BINORMAL",
+        0,
+        DXGI_FORMAT_R32G32B32_FLOAT,
+        0,
+        D3D11_APPEND_ALIGNED_ELEMENT,
+        D3D11_INPUT_PER_VERTEX_DATA,
+        0
     }
 };
 
@@ -88,7 +106,7 @@ bool VertexShader::Build(const std::filesystem::path& filepath)
     str_stream << in_file.rdbuf();
     std::string file_buffer = str_stream.str();
 
-    const std::string search_input_layout = "#include \"../InputLayouts/";
+    const std::string search_input_layout = "#include \"../../InputLayouts/";
     size_t search_pos = file_buffer.find(search_input_layout);
     if (search_pos != std::string::npos)
         search_pos += search_input_layout.length();
@@ -131,17 +149,6 @@ void VertexShader::Bind()
         D3D::GetInstance()->GetContext()->VSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
     }
 }
-
-/*
-ResourceID VertexShader::Create()
-{
-  ResourceID resource_id;
-  resource_id.GenerateNewID();
-
-  sResources.emplace(resource_id, std::make_unique<VertexShader>());
-  return resource_id;
-}
-*/
 
 bool VertexShader::CreateInputLayout(const std::string &filename, ID3DBlob *vertex_shader)
 {

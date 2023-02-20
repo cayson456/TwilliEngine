@@ -6,7 +6,7 @@ template <typename T> std::unordered_map<ResourceID, std::unique_ptr<T>>
   ResourceBase<T>::sResources = std::unordered_map<ResourceID, std::unique_ptr<T>>();
 
 template <typename T> 
-ResourceBase<T>::Key ResourceBase<T>::NullKey = ResourceBase<T>::Key();
+const ResourceBase<T>::Key ResourceBase<T>::NullKey = ResourceBase<T>::Key();
 
 template <typename T>
 template <typename... Args>
@@ -28,10 +28,11 @@ template <typename T>
 ResourceBase<T>::Key ResourceBase<T>::GetResourceWithName(std::string_view name)
 {
     for (auto& res : T::sResources) {
-        if (res.second->mName.compare(name) == 0)
+        if (res.second->mName == name)
             return res.first;
     }
 
+    err::LogError("Attempted to find resource of type ", typeid(T).name(), " with name : ", name, " but was unable to.");
     return T::NullKey;
 }
 

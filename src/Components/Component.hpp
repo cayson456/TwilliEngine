@@ -2,20 +2,25 @@
 
 namespace TwilliEngine
 {
+class Entity;
 
 class Component
 {
 public:
-    Component() {}
-    Component(const std::string& name) : mName(name) {}
-    ~Component() {}
+    Component() : mOwner(nullptr) {}
+    Component(std::string_view name) : mName(std::string(name)), mOwner(nullptr) {}
+    virtual ~Component() {}
 
     std::string mName;
 
-private:
-    
+    Entity* GetOwner() { return mOwner; }
 
+private:
+    friend class Entity;
+
+    Entity* mOwner;
 };
+
 } // namespace TwilliEngine
 
 #include "Component.inl"

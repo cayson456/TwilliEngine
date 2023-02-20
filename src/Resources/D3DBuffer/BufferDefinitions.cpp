@@ -1,6 +1,5 @@
 #include "precompiled.hpp"
-#include "Component.hpp"
-
+#include "BufferDefinitions.hpp"
 
 namespace TwilliEngine
 {

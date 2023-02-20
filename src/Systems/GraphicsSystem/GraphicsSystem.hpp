@@ -16,6 +16,8 @@ public:
 private:
     void InitializeImGui();
     void ShutdownImGui();
+
+    void DrawAllEntities();
 };
 
 } // namespace TwilliEngine

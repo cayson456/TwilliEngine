@@ -13,12 +13,11 @@ public:
     ~Entity() { mComponents.clear(); }
 
     template <typename T>
-    Component* AddComponent();
-    template <typename T>
-    Component* AddComponent(std::string_view name);
+    T* AddComponent(std::string_view name = "Unnamed Component");
 
     template <typename T>
-    Component* GetComponent();
+    T* GetComponent();
+
     Component* GetComponentByName(std::string_view name);
 
     std::string mName;
@@ -26,6 +25,27 @@ public:
 private:
     std::vector<std::unique_ptr<Component>> mComponents;
 
+    // Static Stuff!
+    // I KNOW EVERYTHING IS A GLOBAL... IT'S EASIER x.x
+    //////////////////////////////////////
+public:
+
+    static void ReorganizeEntities();
+
+    static Entity* FindEntityByName(std::string_view name);
+
+    static void RemoveEntityByName(std::string_view name);
+    static void RemoveAllEntites() { sEntities.clear(); }
+
+    static const std::vector<std::unique_ptr<Entity>>& GetEntities() { return sEntities; }
+
+    static Entity* CreateEntity(std::string_view name = "Unnamed Entity");
+
+private:
+
+        // it's a vector so we can iterate through every entity
+        // allows for resorting for more effecient iterations
+    static std::vector<std::unique_ptr<Entity>> sEntities;
 };
 
 } // namespace TwilliEngine

@@ -11,16 +11,14 @@ public:
   
     void Run();
     void Shutdown();
-
-    static void SetQuitFlag() { bRunning = false; }
+ 
+    template <typename T>
+    T* GetSystem() const;
 
 private:
 
     template <typename T>
-    inline void StartSystem();
-
-    template <typename T>
-    inline T* GetSystem() const;
+    void StartSystem();
 
     static bool bRunning;
 

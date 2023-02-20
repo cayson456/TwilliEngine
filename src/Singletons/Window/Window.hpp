@@ -16,6 +16,8 @@ public:
 
     HWND GetHandle() const { return mWindowHandle; }
 
+    std::pair<UINT, UINT> GetResolution() { return mResolution; }
+
 private:
     HWND mWindowHandle;
     

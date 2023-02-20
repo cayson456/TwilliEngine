@@ -19,4 +19,5 @@
 *.ilk
 *.idb
 *.user
-project_vs2022/imgui.ini
+*.ini
+*.enc

@@ -22,6 +22,8 @@ public:
 private:
     std::unique_ptr<Scene> mLoadedScene;
     std::unique_ptr<ResourceLoader> mResourceLoader;
+
+    void ImGuiDisplayResources();
 };
 
 

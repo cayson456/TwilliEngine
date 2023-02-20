@@ -1,5 +1,5 @@
 #include "precompiled.hpp"
-#include "Scene.hpp"
+#include "CameraComponent.hpp"
 
 namespace TwilliEngine
 {

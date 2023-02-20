@@ -10,7 +10,7 @@ class GraphicsComponent : public Component
 {
 public:
     GraphicsComponent() {}
-    GraphicsComponent(const std::string& name) : Component(name) {}
+    GraphicsComponent(std::string_view name) : Component(name) {}
     ~GraphicsComponent() {}
 
     Model::Key mModel;

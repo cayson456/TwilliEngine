@@ -19,10 +19,8 @@ void Core::Run()
     SwapChain::Initialize();
 
         // Must start and loop in a specific order
-    StartSystem<GraphicsSystem>();
     StartSystem<WorldSystem>();
-
-
+    StartSystem<GraphicsSystem>();
 
     while (bRunning)
     {

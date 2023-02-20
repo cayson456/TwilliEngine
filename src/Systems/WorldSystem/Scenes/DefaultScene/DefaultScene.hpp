@@ -7,12 +7,16 @@ namespace TwilliEngine
 class DefaultScene : public Scene
 {
 public:
-    DefaultScene() {}
-    ~DefaultScene() {}
+    DefaultScene();
+    ~DefaultScene();
 
     void StartFrame() override;
     void Update(float dt) override;
     void EndFrame() override;
+
+private:
+    Entity* mBunny;
+    Entity* mCamera;
 };
 
 } // namespace TwilliEngine

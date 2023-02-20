@@ -8,7 +8,6 @@
 
 #include "Utils/FileReader.hpp"
 
-
 namespace
 {
     const std::string TWM_EXT = ".twm";
@@ -21,7 +20,6 @@ namespace
     const std::string SHADER_PROGRAM_PATH = SHADER_PATH + "ShaderPrograms/";
     const std::string CONSTANT_BUFFER_PATH = SHADER_PATH + "ConstantBuffers/";
 }
-
 
 namespace FileExtensions
 {
@@ -74,8 +72,8 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
         err::LogError("Error loading model, incorrect file layout number ", path);
         return Model::NullKey;
     }
-    
-    Model::Key new_model = Model::Create(path.filename().string());
+
+    Model::Key new_model = Model::Create(path.filename().stem().string());
 
         // 08-11: # of Meshes (uint32_t)
     uint32_t num_meshes = 0;
@@ -137,7 +135,6 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
 
             new_mesh->CreateVertexBuffer(Mesh::VertexAttributeType::UV, uvs.data(), num_verts);
         }
-
 
         // All tangents (12 bytes each) (3 floats)
         if (new_mesh->mHasVertexAttribute[Mesh::VertexAttributeType::Tangent]) {
