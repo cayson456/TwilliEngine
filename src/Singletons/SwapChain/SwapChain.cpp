@@ -164,7 +164,7 @@ void SwapChain::CreateDepthStencilState()
 
     D3D11_DEPTH_STENCIL_DESC desc;
 
-    desc.DepthEnable = false;
+    desc.DepthEnable = true;
     desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     desc.DepthFunc = D3D11_COMPARISON_LESS;
 

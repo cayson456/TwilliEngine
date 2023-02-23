@@ -280,7 +280,6 @@ ShaderProgram::Key ResourceLoader::LoadShaderProgram(const std::filesystem::path
     return shader_program;
 }
 
-
 D3DBuffer::Key ResourceLoader::LoadConstantBuffer(const std::filesystem::path &filepath)
 {
     std::ifstream in_file(filepath);
@@ -289,13 +288,14 @@ D3DBuffer::Key ResourceLoader::LoadConstantBuffer(const std::filesystem::path &f
     str_stream << in_file.rdbuf();
     std::string file_buffer = str_stream.str();
 
+        // Find name of the constant buffer to match it with the corresponding struct
     const std::string search = "// byte_width: ";
     size_t search_pos = file_buffer.find(search) + search.length();
     size_t search_end = file_buffer.find('\n', search_pos);
 
     std::string byte_width = file_buffer.substr(search_pos, search_end - search_pos);
 
-    D3DBuffer::Key buffer = D3DBuffer::Create(filepath.filename().string());
+    D3DBuffer::Key buffer = D3DBuffer::Create(filepath.filename().stem().string());
     if (buffer->Build(static_cast<UINT>(std::stoi(byte_width))))
         return buffer;
 

@@ -1,8 +1,8 @@
 #include "precompiled.hpp"
-#include "Component.hpp"
+#include "Material.hpp"
 
 
 namespace TwilliEngine
 {
 
-}
+} // namespace TwilliEngine

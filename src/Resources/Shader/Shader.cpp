@@ -17,7 +17,7 @@ void Shader::SearchAndAssignBuffers(const std::filesystem::path &filepath)
     size_t search_pos = 0;
     size_t search_end = 0;
     UINT buffer_id = 0;
-    const std::string search = "#include \"../ConstantBuffers/";
+    const std::string search = "#include \"../../ConstantBuffers/";
 
     do
     {
@@ -26,7 +26,7 @@ void Shader::SearchAndAssignBuffers(const std::filesystem::path &filepath)
             break;
 
         search_pos += search.length();
-        search_end = file_buffer.find('\"', search_pos);
+        search_end = file_buffer.find('.', search_pos);
 
         std::string buffer_name = file_buffer.substr(search_pos, search_end - search_pos);
         D3DBuffer::Key buffer = D3DBuffer::GetResourceWithName(buffer_name);

@@ -3,13 +3,8 @@
 namespace TwilliEngine
 {
 
-struct Buffer
-{
-    Buffer() {}
-    virtual ~Buffer() = 0;
-};
-
-struct EntityTransform : public Buffer
+// for cbuffer EntityTransform
+struct EntityTransform
 {
     EntityTransform() : mModel(DirectX::XMMatrixIdentity()),
                         mView(DirectX::XMMatrixIdentity()),

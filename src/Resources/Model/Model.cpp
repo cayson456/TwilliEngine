@@ -33,6 +33,7 @@ void Model::Draw()
     for (auto &mesh : mMeshes) {
         mesh->Bind();
 
+        D3D::GetInstance()->GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         D3D::GetInstance()->GetContext()->DrawIndexed(mesh->mNumIndices, 0, 0);
     }
 }

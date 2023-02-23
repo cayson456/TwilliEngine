@@ -49,7 +49,7 @@ public:
 
     static Key GetResourceWithName(std::string_view name);
 
-    static const Key NullKey;
+    static Key NullKey;
 
     ResourceID mID;
     std::string mName;
