@@ -19,6 +19,7 @@ namespace
     const std::string MODEL_PATH = RESOURCE_PATH + "Models/";
     const std::string SHADER_PROGRAM_PATH = SHADER_PATH + "ShaderPrograms/";
     const std::string CONSTANT_BUFFER_PATH = SHADER_PATH + "ConstantBuffers/";
+    const std::string STRUCTURED_BUFFER_PATH = SHADER_PATH + "StructuredBuffers/";
 }
 
 namespace FileExtensions
@@ -35,6 +36,7 @@ void ResourceLoader::LoadAllAssetsInFolder()
 {
     LoadAllModels();
     LoadAllConstantBuffers();
+    LoadAllStructuredBuffers();
     LoadAllShaderPrograms();
 }
 
@@ -285,22 +287,68 @@ D3DBuffer::Key ResourceLoader::LoadConstantBuffer(const std::filesystem::path &f
     std::ifstream in_file(filepath);
     std::stringstream str_stream;
 
+        // Read it into a string stream to find meta data
     str_stream << in_file.rdbuf();
     std::string file_buffer = str_stream.str();
 
         // Find name of the constant buffer to match it with the corresponding struct
-    const std::string search = "// byte_width: ";
-    size_t search_pos = file_buffer.find(search) + search.length();
+    const std::string search_byte_width = "// byte_width: ";
+    size_t search_pos = file_buffer.find(search_byte_width) + search_byte_width.length();
     size_t search_end = file_buffer.find('\n', search_pos);
 
     std::string byte_width = file_buffer.substr(search_pos, search_end - search_pos);
 
-    D3DBuffer::Key buffer = D3DBuffer::Create(filepath.filename().stem().string());
+        // Find name of the constant buffer to match it with the corresponding struct
+    const std::string search_name = "// name: ";
+    search_pos = file_buffer.find(search_name) + search_name.length();
+    search_end = file_buffer.find('\n', search_pos);
+
+    std::string name = file_buffer.substr(search_pos, search_end - search_pos);
+
+    D3DBuffer::Key buffer = D3DBuffer::Create(name);
     if (buffer->Build(static_cast<UINT>(std::stoi(byte_width))))
         return buffer;
 
     buffer.Destroy();
     return D3DBuffer::NullKey;
+}
+
+StructuredBuffer::Key ResourceLoader::LoadStructuredBuffer(const std::filesystem::path& filepath)
+{
+    std::ifstream in_file(filepath);
+    std::stringstream str_stream;
+
+        // Read it into a string stream to find meta data
+    str_stream << in_file.rdbuf();
+    std::string file_buffer = str_stream.str();
+
+        // Find the byte width of the structured buffer
+    const std::string search_byte_width = "// byte_width: ";
+    size_t search_pos = file_buffer.find(search_byte_width) + search_byte_width.length();
+    size_t search_end = file_buffer.find('\n', search_pos);
+
+    std::string byte_width = file_buffer.substr(search_pos, search_end - search_pos);
+
+        // Find name of the structured buffer to match it with the corresponding struct
+    const std::string search_name = "// name: ";
+    search_pos = file_buffer.find(search_name) + search_name.length();
+    search_end = file_buffer.find('\n', search_pos);
+
+    std::string name = file_buffer.substr(search_pos, search_end - search_pos);
+
+        // Find num of elements of the structured buffer
+    const std::string search_num_elements = "// num_elements: ";
+    search_pos = file_buffer.find(search_num_elements) + search_num_elements.length();
+    search_end = file_buffer.find('\n', search_pos);
+
+    std::string num_elements = file_buffer.substr(search_pos, search_end - search_pos);
+
+    StructuredBuffer::Key buffer = StructuredBuffer::Create(name);
+    if (buffer->Build(static_cast<UINT>(std::stoi(byte_width)), std::stoi(num_elements)))
+        return buffer;
+
+    buffer.Destroy();
+    return StructuredBuffer::NullKey;
 }
 
 void ResourceLoader::LoadAllModels()
@@ -326,6 +374,15 @@ void ResourceLoader::LoadAllConstantBuffers()
     for (auto& file : std::filesystem::recursive_directory_iterator(CONSTANT_BUFFER_PATH)) {
         if (file.path().extension() == ".hlsl") {
             LoadConstantBuffer(file);
+        }
+    }
+}
+
+void ResourceLoader::LoadAllStructuredBuffers()
+{
+    for (auto& file : std::filesystem::recursive_directory_iterator(STRUCTURED_BUFFER_PATH)) {
+        if (file.path().extension() == ".hlsl") {
+            LoadStructuredBuffer(file);
         }
     }
 }

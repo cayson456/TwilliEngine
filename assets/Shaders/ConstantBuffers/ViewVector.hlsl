@@ -1,7 +1,9 @@
 // byte_Width: 16
+// name: ViewVector
 
-#define VIEW_VECTOR(x) \
+#define _c_ViewVector(x) \
 cbuffer ViewVector : register(b##x##) \
 { \
-  float4 camera_pos; \
+  float3 camera_pos; \
+  int __light_padding; \
 }

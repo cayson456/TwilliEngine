@@ -44,6 +44,7 @@ void ShaderProgram::AttachVertexShader(VertexShader::Key vertex_shader)
     else
         err::LogError("Attempted to attach unbuilt or invalid vertex shader in ", mName);
 }
+
 void ShaderProgram::AttachPixelShader(PixelShader::Key pixel_shader)
 {
     if (mPixelShader)
@@ -55,6 +56,7 @@ void ShaderProgram::AttachPixelShader(PixelShader::Key pixel_shader)
     else
         err::LogError("Attempted to attach unbuilt or invalid pixel shader in ", mName);
 }
+
 void ShaderProgram::AttachComputeShader(ComputeShader::Key compute_shader)
 {
     if (mComputeShader)

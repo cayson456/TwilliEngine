@@ -44,8 +44,11 @@ void ComputeShader::Bind()
 
     D3D::GetInstance()->GetContext()->CSSetShader(mComputeShader, NULL, 0);
 
-    for (auto& it : mAssignedBuffers) {
-        D3D::GetInstance()->GetContext()->CSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
+    for (auto& it : mAssignedConstantBuffers) {
+        D3D::GetInstance()->GetContext()->VSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
+    }
+    for (auto& it : mAssignedStructuredBuffers) {
+        D3D::GetInstance()->GetContext()->VSSetShaderResources(it.first, 1, it.second->GetShaderResourceView());
     }
 }
 

@@ -46,8 +46,11 @@ void PixelShader::Bind()
 
     D3D::GetInstance()->GetContext()->PSSetShader(mPixelShader, NULL, 0);
 
-    for (auto &it : mAssignedBuffers) {
+    for (auto &it : mAssignedConstantBuffers) {
         D3D::GetInstance()->GetContext()->PSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
+    }
+    for (auto& it : mAssignedStructuredBuffers) {
+        D3D::GetInstance()->GetContext()->PSSetShaderResources(it.first, 1, it.second->GetShaderResourceView());
     }
 }
 

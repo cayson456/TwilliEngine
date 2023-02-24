@@ -1,6 +1,7 @@
 // byte_Width: 256
+// name: EntityTransform
 
-#define ENTITY_TRANSFORM(x) \
+#define _c_EntityTransform(x) \
 cbuffer EntityTransform : register(b##x##) \
 { \
     matrix model; \

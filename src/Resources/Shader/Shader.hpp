@@ -2,7 +2,7 @@
 #include "Resources/ResourceBase.hpp"
 #include "Resources/Model/Mesh.hpp"
 #include "Resources/D3DBuffer/D3DBuffer.hpp"
-
+#include "Resources/StructuredBuffer/StructuredBuffer.hpp"
 
 
 namespace TwilliEngine
@@ -16,7 +16,8 @@ public:
     virtual bool Build(const std::filesystem::path& filepath) = 0;
     virtual void Bind() = 0;
 
-    void AssignBuffer(UINT slot, D3DBuffer::Key buffer);
+    void AssignConstantBuffer(UINT slot, D3DBuffer::Key buffer);
+    void AssignStructuredBuffer(UINT slot, StructuredBuffer::Key buffer);
 
     enum Type
     {
@@ -28,11 +29,11 @@ public:
 
 protected:
     void SearchAndAssignBuffers(const std::filesystem::path& filepath);
-    
 
     HRESULT CompileShader(const std::filesystem::path& filepath, LPCSTR profile, ID3DBlob** blob);
 
-    std::map<UINT, D3DBuffer::Key> mAssignedBuffers;
+    std::map<UINT, D3DBuffer::Key> mAssignedConstantBuffers;
+    std::map<UINT, StructuredBuffer::Key> mAssignedStructuredBuffers;
 };
 
 

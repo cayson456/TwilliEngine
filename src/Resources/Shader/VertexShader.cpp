@@ -145,10 +145,14 @@ void VertexShader::Bind()
     D3D::GetInstance()->GetContext()->IASetInputLayout(mInputLayout);
     D3D::GetInstance()->GetContext()->VSSetShader(mVertexShader, NULL, 0);
 
-    for (auto &it : mAssignedBuffers) {
+    for (auto& it : mAssignedConstantBuffers) {
         D3D::GetInstance()->GetContext()->VSSetConstantBuffers(it.first, 1, it.second->GetBuffer());
     }
+    for (auto& it : mAssignedStructuredBuffers) {
+        D3D::GetInstance()->GetContext()->VSSetShaderResources(it.first, 1, it.second->GetShaderResourceView());
+    }
 }
+
 
 bool VertexShader::CreateInputLayout(const std::string &filename, ID3DBlob *vertex_shader)
 {

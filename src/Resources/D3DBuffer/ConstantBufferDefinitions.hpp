@@ -16,4 +16,12 @@ struct EntityTransform
     DirectX::XMMATRIX mProjection;
     DirectX::XMMATRIX mTransInvModel;
 };
+
+// for cbuffer ViewVector
+struct ViewVector
+{
+    DirectX::XMFLOAT3 mCameraPosition;
+    int32_t __padding;
+};
+
 }

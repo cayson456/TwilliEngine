@@ -1,7 +1,7 @@
 #include "../../InputLayouts/default.hlsl"
 #include "../../ConstantBuffers/EntityTransform.hlsl"
 
-ENTITY_TRANSFORM(0);
+_c_EntityTransform(0);
 
 VertexOut main(VertexIn vin)
 {

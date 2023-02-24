@@ -1,6 +1,6 @@
 #pragma once
 #include "Resources/ResourceBase.hpp"
-#include "BufferDefinitions.hpp"
+#include "ConstantBufferDefinitions.hpp"
 
 namespace TwilliEngine
 {

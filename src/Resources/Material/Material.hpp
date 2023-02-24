@@ -39,8 +39,6 @@ public:
                                       mSpecularScale(1.0f),
                                       mAlphaThreshold(1.0f) {}
 
-private:
-
     DirectX::XMFLOAT4 mAmbientColor;
     DirectX::XMFLOAT4 mEmissiveColor;
     DirectX::XMFLOAT4 mDiffuseColor;

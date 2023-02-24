@@ -1,6 +1,38 @@
 #include "../../InputLayouts/default.hlsl"
+#include "../../ConstantBuffers/Material.hlsl"
+#include "../../ConstantBuffers/ViewVector.hlsl"
+#include "../../StructuredBuffers/Light.hlsl"
+
+_c_ViewVector(0);
+_c_Material(1);
+_t_Light(0);
 
 float4 main(VertexOut vin) : SV_TARGET
 {
-  return float4(1.0f, 1.0f, 0.5f, 1.0f);
+    float3 ambient_term = ambient_color.rgb * ambient_color.a;
+    float3 target_color = ambient_term;
+
+    for (int i = 0; i < LIGHT_NUM_ELEMENTS; ++i) {
+        if (gLights[i].enabled) {
+
+                // Diffuse Term
+            float3 light_vec = normalize(gLights[i].pos_world_space - vin.world_pos);
+            float light_angle = saturate(dot(light_vec, vin.normal));
+
+            float3 diffuse_term = diffuse_color.a * diffuse_color.rgb * light_angle;
+            
+                // Specular Term
+            float3 light_reflected = reflect(vin.normal, light_vec);
+            float3 view_vec = normalize(camera_pos - vin.world_pos);
+            float reflect_angle = saturate(dot(light_reflected, view_vec));
+
+            float3 specular_term = specular_color.a * pow(reflect_angle, specular_power) * specular_color.rgb;
+
+           // float3 specular_term = specular_color.a * pow(dot(specular_dir, view_vec), specular_power) * specular_color.rgb;
+  
+            target_color += diffuse_term + specular_term;
+        }
+    }
+
+    return float4(target_color.x, target_color.y, target_color.z, 1.0f);
 }
