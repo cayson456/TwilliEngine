@@ -1,0 +1,9 @@
+#include "../../InputLayouts/default.hlsl"
+#include "../../ConstantBuffers/Material.hlsl"
+
+_c_Material(0);
+
+float4 main(VertexOut vin) : SV_TARGET
+{
+    return float4(ambient_color.rgb * ambient_color.a, 1.0f);
+}
