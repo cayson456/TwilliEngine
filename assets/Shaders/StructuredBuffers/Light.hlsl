@@ -16,9 +16,9 @@ struct Light
     float range;
 
     bool enabled;
-    int type;
+    uint type;
 
-    int3 __padding;
+    uint3 __padding;
 };
 
 #define _t_Light(x) \

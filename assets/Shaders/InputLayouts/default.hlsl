@@ -7,7 +7,7 @@ struct VertexIn
 {
   float3 pos : POSITION;
   float3 normal : NORMAL;
-  float3 uv : TEXCOORD;
+  float2 uv : TEXCOORD;
 };
 
 struct VertexOut
@@ -15,7 +15,7 @@ struct VertexOut
   float4 pos : SV_POSITION;
   float3 world_pos : POSITION;
   float3 normal : NORMAL;
-  float3 uv : TEXCOORD;
+  float2 uv : TEXCOORD;
 };
 
 #endif

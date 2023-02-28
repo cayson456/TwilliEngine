@@ -80,6 +80,9 @@ LRESULT Window::ProcessMessage(HWND hwnd, UINT msg, WPARAM WParam, LPARAM LParam
     case WM_SYSKEYDOWN:
     case WM_KEYUP:
     case WM_SYSKEYUP:
+        if (ImGui::GetIO().WantCaptureKeyboard)
+            break;
+
         DirectX::Keyboard::ProcessMessage(msg, WParam, LParam);
         break;
 
@@ -95,6 +98,9 @@ LRESULT Window::ProcessMessage(HWND hwnd, UINT msg, WPARAM WParam, LPARAM LParam
     case WM_XBUTTONDOWN:
     case WM_XBUTTONUP:
     case WM_MOUSEHOVER:
+        if (ImGui::GetIO().WantCaptureMouse)
+            break;
+
         DirectX::Mouse::ProcessMessage(msg, WParam, LParam);
         break;
 

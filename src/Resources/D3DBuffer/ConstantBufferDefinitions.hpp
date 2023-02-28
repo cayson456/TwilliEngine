@@ -24,4 +24,10 @@ struct ViewVector
     int32_t __padding;
 };
 
+// for cbuffer Color
+struct Color
+{
+    DirectX::XMFLOAT4 mColor;
+};
+
 }

@@ -26,6 +26,8 @@ public:
     static constexpr UINT ATTRIBUTE_STRIDES[VertexAttributeType::COUNT]
         = {sizeof(float) * 3,
            sizeof(float) * 3,
+           sizeof(float) * 2,
+           sizeof(float) * 3,
            sizeof(float) * 3};
 
     // Does nothing if data is null

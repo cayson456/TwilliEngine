@@ -21,6 +21,8 @@ public:
 private:
     HWND mWindowHandle;
     
+
+
     std::pair<UINT, UINT> mScreenSize;
     std::pair<UINT, UINT> mResolution;
 };

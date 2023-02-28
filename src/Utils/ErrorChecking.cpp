@@ -34,7 +34,7 @@ bool err::HRCheck(HRESULT hr)
 void err::Assert(bool condition, const std::string_view message,
                                  const std::source_location location)
 {
-#ifndef NDEBUG
+
     if (!condition) {
         std::cerr << "file: " << location.file_name() << "("
                               << location.line() << ":"
@@ -43,5 +43,5 @@ void err::Assert(bool condition, const std::string_view message,
                               << message << std::endl;
         std::terminate();
     }
-#endif
+
 }

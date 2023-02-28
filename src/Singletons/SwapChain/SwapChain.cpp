@@ -40,9 +40,10 @@ SwapChain::~SwapChain()
 
 void SwapChain::BindSwapChain()
 {
-    D3D::GetInstance()->GetContext()->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
-    D3D::GetInstance()->GetContext()->OMSetDepthStencilState(mDepthStencilState, 0xFF);
+    D3D::GetInstance()->GetContext()->OMSetDepthStencilState(mDepthStencilState, 1);
     D3D::GetInstance()->GetContext()->OMSetBlendState(mBlendState, nullptr, 0xFFFFFFFF);
+    D3D::GetInstance()->GetContext()->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
+    
 }
 
 void SwapChain::ClearSwapChain()
@@ -64,11 +65,13 @@ void SwapChain::ResizeBuffers(UINT width, UINT height)
 
     BindSwapChain();
     SafeRelease(mRenderTargetView);
+    SafeRelease(mDepthStencilBuffer);
 
     HRESULT hr = mSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
     err::Assert(err::HRCheck(hr), " Unable to Resize SwapChain Buffer");
     
     CreateRenderTargetView();
+    CreateDepthBuffer(width, height);
     CreateDepthStencilView();
 
     BindSwapChain();
@@ -234,7 +237,7 @@ void SwapChain::CreateBlendState()
     desc.IndependentBlendEnable = false;
 
     for (unsigned i = 0; i < 8; ++i) {
-        desc.RenderTarget[i].BlendEnable = true;
+        desc.RenderTarget[i].BlendEnable = false;
         desc.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;
         desc.RenderTarget[i].DestBlend = D3D11_BLEND_ONE;
         desc.RenderTarget[i].BlendOp = D3D11_BLEND_OP_ADD;

@@ -4,12 +4,18 @@
 #include "Scenes/DefaultScene/DefaultScene.hpp"
 #include "imgui/imgui.h"
 
+#include "Singletons/Window/Window.hpp"
+
 namespace TwilliEngine
 {
 WorldSystem::WorldSystem()
 {
-    mResourceLoader = std::make_unique<ResourceLoader>();
+    mMouse = std::make_unique<DirectX::Mouse>();
+    mKeyboard = std::make_unique<DirectX::Keyboard>();
 
+    mMouse->SetWindow(Window::GetInstance()->GetHandle());
+
+    mResourceLoader = std::make_unique<ResourceLoader>();
     mResourceLoader->LoadAllAssetsInFolder();
 
     LoadScene<DefaultScene>();

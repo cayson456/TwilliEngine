@@ -11,7 +11,7 @@
 namespace
 {
     const std::string TWM_EXT = ".twm";
-    const uint32_t FILE_LAYOUT_RELEASE_NUMBER = 2;
+    const uint32_t FILE_LAYOUT_RELEASE_NUMBER = 3;
     const std::string END_OF_FILE = ".twm END OF FILE";
 
     const std::string RESOURCE_PATH = "../assets/";
@@ -25,6 +25,7 @@ namespace
 namespace FileExtensions
 {
     const std::string VERTEX_SHADER_EXT = ".vert";
+    const std::string GEOMETRY_SHADER_EXT = ".geo";
     const std::string PIXEL_SHADER_EXT = ".pixel";
     const std::string COMPUTE_SHADER_EXT = ".comp";
 }
@@ -64,7 +65,7 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
     std::string twm_string = model_file.GetString(4);
 
         // 00-03: ".twm"
-    if (TWM_EXT.compare(twm_string) != 0) {
+    if (twm_string != TWM_EXT) {
         err::LogError("Error loading model, file is not a TWM file ", path);
         return Model::NullKey;
     }
@@ -96,24 +97,24 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
     // Meshes
     /////////////////////////////////////////////////////////////////
     for (std::size_t i = 0; i < num_meshes; ++i) {
-        std::string mesh_name(path.filename().string() + ".Mesh." + std::to_string(i));
+        std::string mesh_name(path.stem().string() + ".Mesh." + std::to_string(i));
         Mesh::Key new_mesh = Mesh::Create(mesh_name);
 
-            // 00-07 - Num Verts (uint64_t)
-        uint64_t num_verts_;
+            // 00-03 - Num Verts (uint64_t)
+        uint32_t num_verts_;
         model_file.GetBytes(&num_verts_);
 
         size_t num_verts = static_cast<size_t>(num_verts_);
 
         new_mesh->mHasVertexAttribute[Mesh::VertexAttributeType::Position] = true;
 
-            // 08-11 Byte Bools determining if vertex attributes exist
+            // 04-07 Byte Bools determining if vertex attributes exist
         model_file.GetBytes(&new_mesh->mHasVertexAttribute[1], 4);
 
-            // 12 - Byte Bool determining if deformer exists
+            // 08 - Byte Bool determining if deformer exists
         model_file.GetBytes(&new_mesh->mHasDeformer);
 
-            // 13-15 RESERVED
+            // 09-11 RESERVED
         model_file.SkipBytes(3);
 
             //  All Vertices (3 floats)
@@ -130,7 +131,7 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
             new_mesh->CreateVertexBuffer(Mesh::VertexAttributeType::Normal, normals.data(), num_verts);
         }
 
-            // All UVs (12 bytes each) (3 floats)
+            // All UVs (8 bytes each) (2 floats)
         if (new_mesh->mHasVertexAttribute[Mesh::VertexAttributeType::UV]) {
             std::vector<float> uvs(num_verts * 2);
             model_file.GetBytes(uvs.data(), sizeof(float) * num_verts * 2);
@@ -140,7 +141,7 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
 
         // All tangents (12 bytes each) (3 floats)
         if (new_mesh->mHasVertexAttribute[Mesh::VertexAttributeType::Tangent]) {
-            std::vector<float> tangents(num_verts * 2);
+            std::vector<float> tangents(num_verts * 3);
             model_file.GetBytes(tangents.data(), sizeof(float) * num_verts * 3);
 
             new_mesh->CreateVertexBuffer(Mesh::VertexAttributeType::Tangent, tangents.data(), num_verts);
@@ -148,14 +149,14 @@ Model::Key ResourceLoader::LoadModel(const std::filesystem::path& path)
 
         // All binormals (12 bytes each) (3 floats)
         if (new_mesh->mHasVertexAttribute[Mesh::VertexAttributeType::Binormal]) {
-            std::vector<float> binormals(num_verts * 2);
+            std::vector<float> binormals(num_verts * 3);
             model_file.GetBytes(binormals.data(), sizeof(float) * num_verts * 3);
 
             new_mesh->CreateVertexBuffer(Mesh::VertexAttributeType::Binormal, binormals.data(), num_verts);
         }
 
         // ALl indicies
-        uint64_t num_indices = 0;
+        uint32_t num_indices = 0;
         model_file.GetBytes(&num_indices);
         std::vector<uint32_t> indices(static_cast<size_t>(num_indices));
         model_file.GetBytes(indices.data(), static_cast<size_t>(num_indices) * sizeof(uint32_t));
@@ -204,10 +205,12 @@ ShaderProgram::Key ResourceLoader::LoadShaderProgram(const std::filesystem::path
 
     // Find all files in folder
     bool b_vertex = false;
+    bool b_geometry = false;
     bool b_pixel = false;
     bool b_compute = false;
 
     std::filesystem::path vertex_path;
+    std::filesystem::path geometry_path;
     std::filesystem::path pixel_path;
     std::filesystem::path compute_path;
 
@@ -217,16 +220,33 @@ ShaderProgram::Key ResourceLoader::LoadShaderProgram(const std::filesystem::path
 
         if (ext == FileExtensions::VERTEX_SHADER_EXT) {
             vertex_path = file.path();
+            if (b_vertex)
+                err::LogError("Multiple Vertex Shaders in Shader Program ", path);
+
             b_vertex = true;
+        }
+
+        else if (ext == FileExtensions::GEOMETRY_SHADER_EXT) {
+            geometry_path = file.path();
+            if (b_geometry)
+                err::LogError("Multiple Vertex Shaders in Shader Program ", path);
+
+            b_geometry = true;
         }
 
         else if (ext == FileExtensions::PIXEL_SHADER_EXT) {
             pixel_path = file.path();
+            if (b_pixel)
+                err::LogError("Multiple Vertex Shaders in Shader Program ", path);
+
             b_pixel = true;
         }
 
         else if (ext == FileExtensions::COMPUTE_SHADER_EXT) {
             compute_path = file.path();
+            if (b_compute)
+                err::LogError("Multiple Vertex Shaders in Shader Program ", path);
+
             b_compute = true;
         }
     }
@@ -249,6 +269,17 @@ ShaderProgram::Key ResourceLoader::LoadShaderProgram(const std::filesystem::path
         }
         else
             shader_program->AttachVertexShader(vertex_shader);
+    }
+
+    if (b_geometry) {
+        GeometryShader::Key geometry_shader = GeometryShader::Create(geometry_path.filename().string());
+
+        if (!geometry_shader->Build(geometry_path)) {
+            err::LogError("Unable to create geometry shader: ", geometry_path);
+            geometry_shader.Destroy();
+        }
+        else
+            shader_program->AttachGeometryShader(geometry_shader);
     }
 
     if (b_pixel) {

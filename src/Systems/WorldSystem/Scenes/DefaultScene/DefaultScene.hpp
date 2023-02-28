@@ -10,6 +10,9 @@
 #include "Resources/D3DBuffer/ConstantBufferDefinitions.hpp"
 #include "Resources/StructuredBuffer/StructuredBufferDefinitions.hpp"
 
+#include "DirectXTK/Keyboard.h"
+#include "DirectXTK/Mouse.h"
+
 namespace TwilliEngine
 {
 
@@ -18,6 +21,28 @@ struct Transform
     DirectX::XMFLOAT3 mTranslation;
     DirectX::XMFLOAT3 mRotation;
     DirectX::XMFLOAT3 mScale;
+};
+
+struct SphericalPolarCoordinates
+{
+    SphericalPolarCoordinates() : mPhi(),
+                                  mTheta(),
+                                  mRadius(), 
+                                  mPhiRadiansPerFrame(), 
+                                  mThetaRadiansPerFrame() {}
+
+    void UpdateFrame() {
+        mPhi += mPhiRadiansPerFrame;
+        mTheta += mThetaRadiansPerFrame;
+    }
+
+    float mPhi;
+    float mTheta;
+    
+    float mRadius;
+
+    float mPhiRadiansPerFrame;
+    float mThetaRadiansPerFrame;
 };
 
 class DefaultScene : public Scene
@@ -31,24 +56,78 @@ public:
     void EndFrame() override;
 
 private:
-    Model::Key mBunnyModel;
-    ShaderProgram::Key mBunnyShader;
+    void UpdateImGui();
+    void UpdateCamera();
+    
+    void UpdateLights();
 
+    void Draw();
+    void LoadTransformBuffer(const Transform& transform);
+    DirectX::Mouse::ButtonStateTracker mMouseTracker;
+
+    bool mDisplayNormals;
+
+    // Shaders
+    //////////////////////////
+    ShaderProgram::Key mPhongShader;
+    ShaderProgram::Key mNormalDisplayShader;
+    ShaderProgram::Key mLightDisplayShader;
+
+    // Models
+    //////////////////////////
+    Model::Key mSphereModel;
+
+    Model::Key mCurrentModel;
+    std::vector<Model::Key> mModels;
+
+    // Camera Data
+    //////////////////////////
     DirectX::XMFLOAT3 mCameraPosition;
     DirectX::XMFLOAT3 mCameraView;
+    DirectX::XMFLOAT2 mCameraAngles;
 
-    ViewVector mViewVector;
+    float mCameraRotationScale;
+    float mCameraMovementScale;
 
-    Transform mBunnyTransform;
-    Material::Key mBunnyMaterial;
+    // Main Object
+    //////////////////////////
+    Transform mMainObjectTransform;    
+    Material::Key mMainObjectMaterial;
 
+    // Lights
+    //////////////////////////
+    static const size_t NUM_LIGHTS = 6;
+
+    SphericalPolarCoordinates mLightPositions[NUM_LIGHTS];
+    Material::Key mLightMaterial[NUM_LIGHTS];
+    
+
+    // Platform
+    //////////////////////////
+    Transform mPlatformTransform;
+    Material::Key mPlatformMaterial;
+    Model::Key mCubeModel;
+ 
+    // Buffers
+    //////////////////////////
+
+        // Entity
     EntityTransform mEntityTransformData;
     D3DBuffer::Key mEntityTransformBuffer;
+
     D3DBuffer::Key mEntityMaterialBuffer;
+    
+        // Lights
+    Light mLights[NUM_LIGHTS];
+    StructuredBuffer::Key mLightsBuffer;
+
+        // View Vector
+    ViewVector mViewVector;
     D3DBuffer::Key mViewVectorBuffer;
 
-    Light mLights[6];
-    StructuredBuffer::Key mLightsBuffer;
+        // Color
+    Color mColor;
+    D3DBuffer::Key mColorBuffer;
 };
 
 } // namespace TwilliEngine

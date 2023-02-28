@@ -11,8 +11,8 @@ VertexOut main(VertexIn vin)
 
     output.pos = mul(mul(world_pos, view), projection);
     output.world_pos = world_pos.xyz;
-//    output.normal = normalize(mul(float4(vin.normal, 0.0f), model).xyz);
-    output.normal = normalize(mul(float4(vin.normal, 0.0f), trans_inv_model).xyz);
+    output.normal = normalize(mul(float4(vin.normal, 0.0f), model).xyz);
+    //output.normal = normalize(mul(float4(vin.normal, 0.0f), trans_inv_model).xyz);
     output.uv = vin.uv;
 
     return output;

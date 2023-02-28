@@ -4,6 +4,9 @@
 #include "Scenes/Scene.hpp"
 #include "ResourceLoader/ResourceLoader.hpp"
 
+#include "DirectXTK/Keyboard.h"
+#include "DirectXTK/Mouse.h"
+
 namespace TwilliEngine
 {
 class WorldSystem : public System
@@ -22,6 +25,9 @@ public:
 private:
     std::unique_ptr<Scene> mLoadedScene;
     std::unique_ptr<ResourceLoader> mResourceLoader;
+
+    std::unique_ptr<DirectX::Mouse> mMouse;
+    std::unique_ptr<DirectX::Keyboard> mKeyboard;
 
     void ImGuiDisplayResources();
 };
